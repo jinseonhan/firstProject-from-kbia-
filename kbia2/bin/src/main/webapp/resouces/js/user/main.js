@@ -1,7 +1,7 @@
 $(document).ready(function() {
-	selectNoticeList();
-	logMarge();
-	selectPopupList();
+	/*selectNoticeList();*/
+	/*logMarge();*/
+/*	selectPopupList();*/
 });
 function getCookie(name,boardNo) { 
 	var cookie = document.cookie; 

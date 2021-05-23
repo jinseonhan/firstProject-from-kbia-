@@ -1,10 +1,10 @@
 $(document).ready(function() {
-	selectMainBannerList();
+/*	selectMainBannerList();
 	selectNoticeList();
 	logMarge();
 	selectPopupList();
 	mainMembers();
-	litBanners();
+	litBanners();*/
 	
 	$("#langType").on("change", function(){
 		selectMainBannerList();

@@ -7,8 +7,8 @@
 	<div id="container">
 		<div class="mainContents">
 			<!-- mainCont -->
-			<div class="mainCont v1">
-				<!-- mainSwiper -->
+<!-- 			<div class="mainCont v1">
+				mainSwiper
 				<div class="mainSwiper">
 					<div class="swiper-wrapper">
 						<div class="swiper-slide">
@@ -24,22 +24,22 @@
 							<img src="resouces/images/user/main/img0102.png" alt=" ">
 						</div>
 					</div>
-					<!-- btnArea -->
+					btnArea
 					<div class="btnArea">
 						<div class="swiper-pagination"></div>
 						<a href="" class="btnPlay">재생</a>
 						<a href="" class="btnStop">정지</a>
 					</div>
-					<!--// btnArea -->
+					// btnArea
 				</div>
-				<!--// mainSwiper -->
+				// mainSwiper
 				<div class="inner">
 					<a href="/openMemberGuide.do">
 						<strong>회원사<br />가입 안내</strong>
 						<p>KBIA MEMBERSHIP SERVICE 회원가입</p>
 					</a>
 				</div>
-			</div>
+			</div> -->
 			<!--// mainCont -->
 
 			<!-- mainCont -->

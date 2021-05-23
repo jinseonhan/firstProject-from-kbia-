@@ -10,7 +10,7 @@
 	<div id="container">
 		<div class="mainContents">
 			<!-- mainCont -->
-			<div class="mainCont v1">
+			<div class="mainCont v1" style="display:none;">
 				<!-- mainSwiper -->
 				<div class="mainSwiper">
 

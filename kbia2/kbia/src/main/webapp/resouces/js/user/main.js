@@ -1,7 +1,7 @@
 
 
 $(document).ready(function() {
-	selectMainBannerList();
+	/*selectMainBannerList();*/
 	selectNoticeList();
 	logMarge();
 	selectPopupList();
