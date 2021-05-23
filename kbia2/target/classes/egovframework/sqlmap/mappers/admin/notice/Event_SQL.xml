@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.notice.dao.EventMapper">
+	<!-- <select id="selectUserCnt" parameterType="egovframework.admin.account.vo.AccountVO" resultType="int">
+			SELECT COUNT(USER_ID) CNT
+			FROM G_USER
+			WHERE 1=1
+			<if test='userIdNm != null and userIdNm != ""'> 
+				AND ( USER_ID LIKE CONCAT("%", #{userIdNm} , "%") OR USER_NM LIKE CONCAT("%", #{userIdNm} , "%") )
+			</if>	
+	</select>
+	 -->
+
+	<select id="selectEventList" parameterType="egovframework.admin.notice.vo.NoticeVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 (SELECT C.CODE_NM FROM COM_CODE C WHERE LANGUAGE_TYPE = C.CODE_DTL AND C.CODE_NO='COMM') AS LANGUAGE_TYPE,
+				 CONTENT,
+				 DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS START_DT,
+				 TITLE, 
+				 USE_YN,
+				 CREATE_ID,
+				 DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d'), '%Y.%m.%d') AS END_DT
+			
+			FROM        
+				NOTICE_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			
+			<if test='useYn != null and useYn != ""'>
+			AND (USE_YN LIKE CONCAT("%", #{useYn}, "%"))
+			</if>
+			<if test='languageType != null and languageType != ""' >
+			AND (LANGUAGE_TYPE LIKE CONCAT("%", #{languageType}, "%"))
+			</if>	
+			
+			<if test='title != null and title != ""'>
+			AND (TITLE LIKE CONCAT("%", #{title}, "%"))
+			</if>
+			
+			<if test='startDt != null and startDt != "" and endDt != null and endDt != ""'>
+            <!-- 
+            AND UPDATE_DATE BETWEEN REPLACE(#{startBriefDate}, '-', '') AND REPLACE(#{endBriefDate}, '-', '')
+             -->
+            AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '') AND START_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')
+         	</if>
+         	
+         	<if test='startDt != null and startDt != "" '>
+         	AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '')  
+         	</if>
+         	
+         	<if test='endDt != null and endDt != "" '>
+         	AND END_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')  
+         	</if>
+			ORDER BY START_DT DESC
+	</select>
+	
+	<insert id="EventRegist" parameterType="egovframework.admin.notice.vo.NoticeVO">
+		INSERT INTO NOTICE_BOARD  (
+	  		BOARD_NO  
+	   		, BOARD_TYPE
+	   		, CREATE_ID
+	   		, TITLE
+	   		, CONTENT
+	   		, CREATE_DATE
+	   		, START_DT
+	   		, END_DT
+	   		, UPDATE_DATE
+	   		, LANGUAGE_TYPE
+	   		, USE_YN
+	   		, VIEW_CNT 		
+		) 
+		SELECT 
+	   		#{boardNo}
+	   		, #{boardType}
+	   		, #{createId}
+	   		, #{title}
+	   		, #{content}
+	   		, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	   		, CONCAT(REPLACE(#{startDt},'-',''),#{eventStHour},#{eventStMinute},'00')
+	   		, CONCAT(REPLACE(#{endDt},'-',''),#{eventEndSHour},#{eventEndEMinute},'00')
+	   		, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	   		, #{languageType}
+	   		, #{useYn}
+	   		, '1'
+	</insert>
+	
+	
+	<select id="selectEvent" parameterType="egovframework.admin.notice.vo.NoticeVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 LANGUAGE_TYPE,
+				 CONTENT,
+				 DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%Y-%m-%d') AS START_DT,
+				 DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d%H%i%S'), '%Y-%m-%d') AS END_DT,
+				 DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%H') AS eventStHour,
+			   	DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%i') AS eventStMinute,
+			   	DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d%H%i%S'), '%H') AS eventEndSHour,
+			   	DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d%H%i%S'), '%i') AS eventEndEMinute,
+				 TITLE, 
+				 USE_YN,
+				 CREATE_ID,
+				 DATE_FORMAT(STR_TO_DATE(UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS UPDATE_DATE
+			
+			FROM 
+				NOTICE_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			
+			<if test='startDt != null and startDt != "" and endDt != null and endDt != ""'>
+        
+            AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '') AND START_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')
+         	</if>
+         	
+         	<if test='startDt != null and startDt != "" '>
+         	AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '')  
+         	</if>
+         	
+         	<if test='endDt != null and endDt != "" '>
+         	AND END_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')  
+         	</if>
+			ORDER BY ROW_NUM DESC
+	</select>
+	
+	<update id="eventUpdate" parameterType="egovframework.admin.notice.vo.NoticeVO">
+	
+		UPDATE NOTICE_BOARD SET
+		
+		BOARD_TYPE = #{boardType},
+		CREATE_ID = #{createId},
+		CONTENT = #{content},
+		TITLE = #{title},
+		START_DT = CONCAT(REPLACE(#{startDt},'-',''),#{eventStHour},#{eventStMinute},'00'),
+		END_DT = CONCAT(REPLACE(#{endDt},'-',''),#{eventEndSHour},#{eventEndEMinute},'00'),
+		LANGUAGE_TYPE = #{languageType},
+		USE_YN = #{useYn},
+		UPDATE_DATE  = 	DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+		where 1=1
+		<if test='boardNo != null and boardNo !=""'>
+				AND BOARD_NO = #{boardNo}
+				</if>
+				<if test='boardType != null and boardType !=""'>
+				AND BOARD_TYPE = #{boardType}
+				</if>
+		
+		</update>
+		
+	<delete id="deleteEvent">
+	
+	
+		DELETE FROM NOTICE_BOARD
+		
+		where 1=1
+		
+		<if test='boardNo != null and boardNo !=""'>
+				AND BOARD_NO = #{boardNo}
+				</if>
+				<if test='boardType != null and boardType !=""'>
+				AND BOARD_TYPE = #{boardType}
+				</if>
+	
+	
+	</delete>
+	
+	
+</mapper>

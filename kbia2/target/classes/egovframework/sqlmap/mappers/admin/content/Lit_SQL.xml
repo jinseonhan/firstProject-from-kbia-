@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.content.dao.LitMapper">
+
+	<!-- 소배너 리스트 호출 -->
+	<select id="selectLitList" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 (SELECT C.CODE_NM FROM COM_CODE C WHERE LANGUAGE_TYPE = C.CODE_DTL AND C.CODE_NO='COMM') AS LANGUAGE_TYPE,
+				 LINK,
+				 CONTENT,
+				 DATE_FORMAT(STR_TO_DATE(CREATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS CREATE_DATE,
+				 TITLE, 
+				 LOCATION_N,
+				 USE_YN,
+				 CREATE_ID,
+				 OUT_DIV,
+				 DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d'), '%Y.%m.%d') AS END_DT
+			
+			FROM 
+				CONTENT_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			
+			<if test='useYn != null and useYn != ""'>
+			AND (USE_YN LIKE CONCAT("%", #{useYn}, "%"))
+			</if>
+			<if test='languageType != null and languageType != ""' >
+			AND (LANGUAGE_TYPE LIKE CONCAT("%", #{languageType}, "%"))
+			</if>	
+			
+			<if test='title != null and title != ""'>
+			AND (TITLE LIKE CONCAT("%", #{title}, "%"))
+			</if>
+			
+         	<if test='startDt != null and startDt != "" '>
+         	<![CDATA[ AND SUBSTR(CREATE_DATE,1,8) >= REPLACE(#{startDt}, '-', '') ]]> 
+         	</if>
+         	
+         	<if test='endDt != null and endDt != "" '>
+         	<![CDATA[ AND SUBSTR(CREATE_DATE,1,8) <= REPLACE(#{endDt}, '-', '') ]]> 
+         	</if>
+         	
+         	<if test='mainPage != null and mainPage != "" '>
+	         	<if test='bannerDate != null and bannerDate != "" '>
+	         	AND (#{bannerDate} BETWEEN START_DT AND END_DT OR OUT_DIV = 'Y')
+	         	</if>
+         	</if>
+         	<if test='useYn != null and useYn != ""'>
+			AND USE_YN = #{useYn}
+			</if>
+			
+
+			ORDER BY 
+
+		
+			<if test='mainPage != null and mainPage != "" '>
+				 LOCATION_N,
+			</if>
+				START_DT DESC
+
+	</select>
+
+	<!-- 노출순위 중복체크 -->
+	<select id="locationNcheck" parameterType="egovframework.admin.content.vo.ContentVO" resultType="int">
+	SELECT COUNT(*) FROM CONTENT_BOARD
+      WHERE
+      	  BOARD_TYPE = #{boardType}
+      AND
+          LOCATION_N = #{locationN}
+      AND
+          USE_YN = 'Y'
+	</select>
+	
+	<!-- 업데이트 시 기존 정보 노출순위 중복체크 -->
+	<select id="keepCheck" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+	 SELECT
+		LOCATION_N,
+		USE_YN
+	 FROM 
+		CONTENT_BOARD
+	 WHERE
+ 			BOARD_TYPE = #{boardType}
+		AND
+    		LOCATION_N != #{locationN}
+ 		AND
+    		USE_YN = 'Y'
+	</select>
+	
+	<!-- 소배너 등록 -->
+	<insert id="litRegist" parameterType="egovframework.admin.content.vo.ContentVO">
+		INSERT INTO CONTENT_BOARD  (
+	  		BOARD_NO  
+	   		, BOARD_TYPE
+	   		, CREATE_ID
+	   		, CONTENT
+	   		, LINK	 
+	   		, CREATE_DATE
+	   		, UPDATE_DATE
+	   		, LOCATION_N
+	   		, LANGUAGE_TYPE
+	   		, USE_YN
+	   		, URL_TYPE
+	   		 		
+		) 
+		SELECT 
+	   		#{boardNo}
+	   		, #{boardType}
+	   		, #{createId}
+	   		, #{content}
+	   		, #{link}
+	   		, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	   		, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	   		, #{locationN}
+	   		, #{languageType}
+	   		, #{useYn}
+	   		, #{urlType}
+	</insert>
+	
+	<!-- 소배너 내용 상세보기 -->
+	<select id="selectLitContent" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 LANGUAGE_TYPE,
+				 LINK,
+				 CONTENT,
+				 LOCATION_N,
+				 USE_YN,
+				 CREATE_ID,
+				 DATE_FORMAT(STR_TO_DATE(UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS UPDATE_DATE,
+				 URL_TYPE
+			
+			FROM 
+				CONTENT_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>		
+			ORDER BY ROW_NUM DESC
+	</select>
+	
+	<!-- 소배너 수정하기 -->
+	<update id="updateLit" parameterType="egovframework.admin.content.vo.ContentVO">
+	UPDATE CONTENT_BOARD
+	SET 
+			CONTENT = #{content},
+	   		LINK = #{link},	 
+	   		UPDATE_DATE = DATE_FORMAT(now(), '%Y%m%d%H%i%s'),
+	   		LOCATION_N = #{locationN},
+	   		LANGUAGE_TYPE = #{languageType},
+	   		USE_YN = #{useYn},
+	   		URL_TYPE = #{urlType}
+	WHERE BOARD_NO = #{boardNo}
+	AND BOARD_TYPE = #{boardType}
+	</update>
+	
+	<delete id="deleteLit">
+	DELETE FROM CONTENT_BOARD
+	WHERE 
+		BOARD_NO = #{boardNo}
+	AND
+		BOARD_TYPE = #{boardType}
+	</delete>
+	
+	<select id="srcPopList" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+	SELECT BOARD_NO,
+			BOARD_TYPE, 
+			LANGUAGE_TYPE,
+			TITLE
+	FROM ${tableNm}
+	WHERE BOARD_TYPE=#{boardType}
+	AND (TITLE LIKE CONCAT("%", #{title}, "%"))
+	</select>
+	
+</mapper>

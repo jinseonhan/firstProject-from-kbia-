@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.cmmn.file.dao.FileMapper">	
+	<!-- FileList 조회  -->	
+	<select id="selectFileList" parameterType="egovframework.cmmn.file.vo.FileVO" resultType="hashMap">
+		SELECT
+			TFM.IDX
+			,TFM.REF_IDX
+			, TFM.REF_TYPE
+			, TFM.FILE_PATH
+			, TFM.OGN_FILE_NM
+			, TFM.ST_FILE_NM
+			, TFM.FILE_SIZE
+			, TFM.RGT_ID
+			, DEL_YN
+		
+		FROM
+			TB_FILE_MNG TFM
+		WHERE 1=1
+		AND TFM.REF_IDX = #{refIdx}
+		AND TFM.REF_TYPE = #{refType}
+		<if test='orgIdx != null and orgIdx != ""'> 
+		AND TFM.IDX = #{orgIdx}
+		</if>
+		<if test='subFilePath != null and subFilePath != ""'> 
+		AND SUBSTR(FILE_PATH, (LENGTH(FILE_PATH)+1-LENGTH(#{subFilePath})-1),LENGTH(#{subFilePath})) = #{subFilePath}
+		</if>
+	</select>
+	
+	<!-- 파일 정보 등록 -->
+	<insert id="insertFileInfo" parameterType="egovframework.cmmn.file.vo.FileVO">
+		INSERT INTO TB_FILE_MNG (	
+			REF_IDX
+			, REF_TYPE
+			, FILE_PATH
+			, OGN_FILE_NM
+			, ST_FILE_NM
+			, FILE_SIZE	
+			, RGT_ID	
+		) VALUES (
+			#{refIdx}
+			, #{refType}
+			, #{filePath}
+			, #{ognFileNm}
+			, #{stFileNm}
+			, #{fileSize}
+			, #{rgtId}
+		)
+	</insert>
+	
+	<!-- 파일 상태 -->
+	<update id="filedel" parameterType="egovframework.cmmn.file.vo.FileVO">
+		DELETE FROM TB_FILE_MNG 
+		 WHERE REF_IDX = #{refIdx}
+		 AND REF_TYPE = #{refType}
+		 <if test='idx != null and idx != ""'> 
+			AND IDX = #{idx}
+		  </if>
+	</update>
+	
+	<!-- 파일 저장상태 -->
+	<update id="fileStatUpdate" parameterType="egovframework.cmmn.file.vo.FileVO">
+	 UPDATE TB_FILE_MNG SET DEL_YN = #{delYn}
+	  WHERE REF_IDX = #{refIdx}
+	 	AND REF_TYPE = #{refType} 
+	  <if test='idx != null and idx != ""'> 
+		AND IDX = #{idx}
+	  </if> 
+	</update>
+</mapper>

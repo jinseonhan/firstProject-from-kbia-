@@ -1,0 +1,78 @@
+@charset "utf-8"; 
+@font-face {
+	font-family:'Noto Sans KR'; 
+	font-style:normal; 
+	font-weight:300; 
+	src:url("/resouces/fonts/user/NotoSansKR-Light.woff2") format('woff2'),
+		url("/resouces/fonts/user/NotoSansKR-Light.woff") format('woff'),
+		url("/resouces/fonts/user/NotoSansKR-Light.otf") format('opentype'); 
+}
+@font-face {
+	font-family:'Noto Sans KR'; 
+	font-style:normal; 
+	font-weight:400; 
+	src:url("/resouces/fonts/user/NotoSansKR-Regular.woff2") format('woff2'),
+		url("/resouces/fonts/user/NotoSansKR-Regular.woff") format('woff'),
+		url("/resouces/fonts/user/NotoSansKR-Regular.otf") format('opentype'); 
+}
+@font-face {
+	font-family:'Noto Sans KR'; 
+	font-style:normal; 
+	font-weight:500; 
+	src:url("/resouces/fonts/user/NotoSansKR-Medium.woff2") format('woff2'),
+		url("/resouces/fonts/user/NotoSansKR-Medium.woff") format('woff'),
+		url("/resouces/fonts/user/NotoSansKR-Medium.otf") format('opentype'); 
+}
+@font-face {
+	font-family:'Noto Sans KR'; 
+	font-style:normal; 
+	font-weight:700; 
+	src:url("/resouces/fonts/user/NotoSansKR-Bold.woff2") format('woff2'),
+		url("/resouces/fonts/user/NotoSansKR-Bold.woff") format('woff'),
+		url("/resouces/fonts/user/NotoSansKR-Bold.otf") format('opentype'); 
+}
+* {margin:0; padding:0; box-sizing:border-box}
+body {overflow-y:auto; position:relative; letter-spacing:-0.03em; font-size:14px; font-family:"Noto Sans KR" , sans-serif; color:#333}
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, textarea, p, blockquote, th, td, address {margin:0; padding:0}
+pre {margin:0; padding:0; word-wrap:break-word; white-space:pre-line}
+table {border:0; border-collapse:collapse; border-spacing:0; width:100%}
+fieldset, img {border:0;vertical-align:top}
+ul, li {list-style:none}
+h1, h2, h3, h4, h5, h6 {font-size:100%; font-weight:normal; line-height:1em}
+a {text-decoration:none; cursor:pointer}
+body {position:relative}
+em {font-style:normal}
+legend, hr, caption {display:none}
+
+/* input type */
+input[type=text],
+input[type=password] {border:1px solid #ccc; padding:0 28px; margin:0; height:54px; font-size:16px; color:#000; box-sizing:border-box}
+textarea {resize:none; padding:5px; line-height:18px; color:#444; border:1px solid #ccc; background:#fff}
+.selectBox {display:inline-block; position:relative}
+.selectBox span {display:block; padding:0 46px 0 28px; border:1px solid #ccc; line-height:52px; font-size:16px; color:#000; background:url("/resouces/images/user/bl-arrow.png") no-repeat right 15px center/12px}
+.selectBox select {position:absolute; top:0; left:0; width:100%; height:100%; opacity:0}
+@media (max-width: 1160px) {
+	input[type=text],
+	input[type=password] {padding:0 15px; height:45px; font-size:14px}
+	.selectBox span {padding:0 30px 0 15px; line-height:43px; font-size:14px; background:url("/resouces/images/user/bl-arrow.png") no-repeat right 15px center/10px}
+}
+@media (max-width: 767px) {
+	input[type=text],
+	input[type=password] {padding:0 10px; height:33px; font-size:13px}
+	.selectBox span {padding:0 24px 0 10px; line-height:31px; font-size:13px; background:url("/resouces/images/user/bl-arrow.png") no-repeat right 10px center/8px}
+}
+
+::-webkit-input-placeholder {color:#999}
+::-moz-placeholder {color:#999}
+:-ms-input-placeholder {color:#999}
+:-moz-placeholder {color:#999}
+input:read-only {background:#e8e8e8}
+input:-moz-read-only {background:#e8e8e8}
+
+/* skip nav */
+#skipNav {height:0}
+#skipNav dt {overflow:hidden; position:absolute !important; width:1px; height:1px}
+#skipNav dd a {overflow:hidden; display:block; position:absolute; top:-10000px; left:0; z-index:999999; width:100%; font-size:16px; text-align:center}
+#skipNav dd a.on {overflow:hidden; position:absolute; top:0; left:0; padding:15px 0; background:#272727; font-weight:bold; color:#fff}
+
+.autocomplete { position: relative; display: inline-block; } .autocomplete-items { position: absolute; border: 1px solid #d4d4d4; border-bottom: none; border-top: none; z-index: 99; top: 100%; left: 0; right: 0; } .autocomplete-items div { padding: 10px; cursor: pointer; background-color: #fff; border-bottom: 1px solid #d4d4d4; } .autocomplete-items div:hover { background-color: #e9e9e9; } .autocomplete-active { background-color: DodgerBlue !important; color: #ffffff; }

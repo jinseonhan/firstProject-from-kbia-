@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.content.dao.PupMapper">
+	<!-- <select id="selectUserCnt" parameterType="egovframework.admin.account.vo.AccountVO" resultType="int">
+			SELECT COUNT(USER_ID) CNT
+			FROM G_USER
+			WHERE 1=1
+			<if test='userIdNm != null and userIdNm != ""'> 
+				AND ( USER_ID LIKE CONCAT("%", #{userIdNm} , "%") OR USER_NM LIKE CONCAT("%", #{userIdNm} , "%") )
+			</if>	
+	</select>
+	 -->
+	 
+
+	<select id="selectPupList" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 LANGUAGE_TYPE,
+				 DIVISION,
+				 LINK,
+				 CONTENT,
+				 DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d'), '%Y.%m.%d') AS START_DT,
+				 TITLE, 
+				 LOCATION,
+				 USE_YN,
+				 CREATE_ID,
+				 OUT_DIV,
+				 DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d'), '%Y.%m.%d') AS END_DT
+				 
+			
+			FROM 
+				CONTENT_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			
+			<if test='regStartDate != null and regStartDate != "" and regEndDate != null and regEndDate != ""'>
+            <!-- 
+            AND UPDATE_DATE BETWEEN REPLACE(#{startBriefDate}, '-', '') AND REPLACE(#{endBriefDate}, '-', '')
+             -->
+            AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{regStartDate}, '-', '') AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{regEndDate}, '-', '')
+         	</if>
+         	
+         	<if test='regStartDate != null and regStartDate != "" '>
+         	AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{regStartDate}, '-', '')  
+         	</if>
+         	
+         	<if test='regEndDate != null and regEndDate != "" '>
+         	AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{regEndDate}, '-', '')  
+         	</if>
+			
+			<if test='useYn != null and useYn != ""'>
+			AND (USE_YN LIKE CONCAT("%", #{useYn}, "%"))
+			</if>
+			<if test='languageType != null and languageType != ""' >
+			AND (LANGUAGE_TYPE LIKE CONCAT("%", #{languageType}, "%"))
+			</if>	
+			
+			<if test='title != null and title != ""'>
+			AND (TITLE LIKE CONCAT("%", #{title}, "%"))
+			</if>
+			
+			<if test='startDt != null and startDt != "" and endDt != null and endDt != ""'>
+            <!-- 
+            AND UPDATE_DATE BETWEEN REPLACE(#{startBriefDate}, '-', '') AND REPLACE(#{endBriefDate}, '-', '')
+             -->
+            AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '') AND START_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')
+         	</if>
+         	
+         	<if test='startDt != null and startDt != "" '>
+         	AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '')  
+         	</if>
+         	
+         	<if test='endDt != null and endDt != "" '>
+         	AND END_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')  
+         	</if>
+			ORDER BY ROW_NUM DESC
+	</select>
+	
+	
+	<select id="selectPopup" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 LANGUAGE_TYPE,
+				 DIVISION,
+				 LINK,
+				 CONTENT,
+				 DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%Y-%m-%d') AS START_DT,
+				 DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d%H%i%S'), '%Y-%m-%d') AS END_DT,
+				 
+				 DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%H') AS POPUP_STHOUR,
+			   	DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%i') AS POPUP_STMINUTE,
+			   	 DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%H') AS POPUP_ENDSHOUR,
+			   	DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%i') AS POPUP_ENDHOUR,
+				 TITLE, 
+				 LOCATION,
+				 USE_YN,
+				 CREATE_ID,
+				 OUT_DIV
+			
+			FROM 
+				CONTENT_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			
+			<if test='startDt != null and startDt != "" and endDt != null and endDt != ""'>
+        
+            AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '') AND START_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')
+         	</if>
+         	
+         	<if test='startDt != null and startDt != "" '>
+         	AND START_DT <![CDATA[>=]]> REPLACE(#{startDt}, '-', '')  
+         	</if>
+         	
+         	<if test='endDt != null and endDt != "" '>
+         	AND END_DT <![CDATA[<=]]> REPLACE(#{endDt}, '-', '')  
+         	</if>
+			ORDER BY ROW_NUM DESC
+	</select>
+	
+	
+	
+	<insert id="popupRegist" parameterType="egovframework.admin.content.vo.ContentVO">
+		INSERT INTO CONTENT_BOARD  (
+	  		BOARD_NO  
+	   		, BOARD_TYPE
+	   		, CREATE_ID
+	   		, DIVISION
+	   		, TITLE
+	   		, CONTENT
+	   		, LINK	  
+	   		, START_DT
+	   		, END_DT
+	   		, LOCATION
+	   		, OUT_DIV
+	   		, LANGUAGE_TYPE
+	   		, USE_YN
+	   		 		
+		) 
+		SELECT 
+	   		#{boardNo}
+	   		, #{boardType}
+	   		, #{createId}
+	   		, #{division}
+	   		, #{title}
+	   		, #{content}
+	   		, #{link}
+	   		, CONCAT(REPLACE(#{startDt},'-',''),#{popupStHour},#{popupStMinute},'00')
+	   		, CONCAT(REPLACE(#{endDt},'-',''),#{popupEndSHour},#{popupEndEHour},'00')
+	   		, #{location}
+	   		, #{outDiv}
+	   		, #{languageType}
+	   		, #{useYn}
+	</insert>
+	
+	<select id="popMax" parameterType="egovframework.admin.content.vo.ContentVO" resultType="int">
+	
+	SELECT 
+		max(BOARD_NO)  
+	FROM 
+		CONTENT_BOARD 
+		
+	where BOARD_TYPE ='POPUP'
+	
+	
+	
+	</select>
+	
+	<update id="popupUpdate" parameterType="egovframework.admin.content.vo.ContentVO">
+	
+	UPDATE CONTENT_BOARD SET
+	
+	BOARD_TYPE = #{boardType},
+	CREATE_ID = #{createId},
+	DIVISION = #{division},
+	TITLE = #{title},
+	CONTENT = #{content},
+	LINK = #{link},
+	START_DT = CONCAT(REPLACE(#{startDt},'-',''),#{popupStHour},#{popupStMinute},'00'),
+	END_DT = CONCAT(REPLACE(#{endDt},'-',''),#{popupEndSHour},#{popupEndEHour},'00'),
+	LOCATION = #{location},
+	OUT_DIV = #{outDiv},
+	LANGUAGE_TYPE = #{languageType},
+	USE_YN = #{useYn}
+	where 1=1
+	<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+	
+	</update>
+	
+	<delete id="popupDelete">
+	
+	
+	DELETE FROM CONTENT_BOARD
+	
+	where 1=1
+	
+	<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+	
+	
+	</delete>
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.user.info.dao.InfoMapper">
+
+	<update id = "briefViewCnt" parameterType="egovframework.user.info.vo.InfoVO">
+		UPDATE INFO_BOARD
+		SET VIEW_CNT = VIEW_CNT + 1
+		WHERE 1=1
+				AND BOARD_NO = #{boardNo}
+				
+				
+	</update>
+
+	<select id="selectBriefList" parameterType="egovframework.user.info.vo.InfoVO" resultType="hashMap">
+		SELECT
+			 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+			 A.BOARD_NO,
+			 A.BOARD_TYPE,
+			 A.CREATE_ID, 
+			 A.TITLE,
+			 A.USE_YN,
+			 IDX,
+			 REF_TYPE,
+			 TFM.REF_IDX,
+			 (SELECT COUNT(IDX) FROM TB_FILE_MNG TFM WHERE TFM.REF_IDX = A.BOARD_NO) AS FILE_CNT,
+			 A.VIEW_CNT,
+			 A.CREATE_DATE AS ORG_CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS UPDATE_DATE
+		FROM 
+			INFO_BOARD A
+			RIGHT JOIN TB_FILE_MNG TFM
+			ON A.BOARD_NO = TFM.REF_IDX
+			, (SELECT @ROWNUM := 0) AS RN 
+		WHERE 1=1
+			<if test='kinds == "all"'>
+				AND ((A.TITLE LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.CREATE_ID LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.CONTENT LIKE CONCAT("%", #{searchTxt}, "%"))
+					)
+			</if>
+			<if test='kinds == "title" and searchTxt != null and searchTxt != ""'>
+				AND (A.TITLE LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "createId" and searchTxt != null and searchTxt !=""'>
+				AND (A.CREATE_ID LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "content" and searchTxt != null and searchTxt !=""'>
+				AND (A.CONTENT LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='boardType != null and boardType !=""'>
+				AND A.BOARD_TYPE = #{boardType}
+			</if>
+			ORDER BY CREATE_DATE DESC, A.BOARD_NO DESC
+	</select>
+	
+	<select id="selectBriefContent" parameterType="egovframework.user.info.vo.InfoVO" resultType="map">
+			SELECT
+				 A.BOARD_NO,
+				 A.BOARD_TYPE,
+				 A.CREATE_ID, 
+				 A.TITLE,
+				 <![CDATA[
+				 replace(A.CONTENT, '\r\n',  '</br>' ) AS CONTENT,
+				 ]]>
+				 A.VIEW_CNT,
+				 A.USE_YN,
+				 A.LANGUAGE_TYPE,
+				 A.CREATE_DATE AS ORG_CREATE_DATE,
+				 DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE,
+				 DATE_FORMAT(STR_TO_DATE(A.UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS UPDATE_DATE,
+				 BF.CREATE_DATE AS ORG_BF_CREATE_DATE,
+				 NT.CREATE_DATE AS ORG_NT_CREATE_DATE,
+				 BF.BOARD_NO AS BF_BOARD_NO,
+    			 NT.BOARD_NO AS NT_BOARD_NO,
+    			 BF.BOARD_TYPE AS BF_BOARD_TYPE,
+    			 NT.BOARD_TYPE AS NT_BOARD_TYPE,
+    			 BF.TITLE AS BF_TITLE,
+    			 NT.TITLE AS NT_TITLE
+    			 
+			FROM 
+				INFO_BOARD A
+				<![CDATA[
+				LEFT OUTER JOIN(SELECT B.* 
+								FROM INFO_BOARD B 
+								WHERE B.CREATE_DATE < #{createDate} AND B.BOARD_TYPE = #{boardType} ]]> 
+									<if test='kinds == "all"'>
+									AND ((B.TITLE LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.CREATE_ID LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.CONTENT LIKE CONCAT("%", #{searchTxt}, "%"))
+										)
+									</if>
+									<if test='kinds == "title" and searchTxt != null and searchTxt != ""'>
+										AND (B.TITLE LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "createId" and searchTxt != null and searchTxt !=""'>
+										AND (B.CREATE_ID LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "content" and searchTxt != null and searchTxt !=""'>
+										AND (B.CONTENT LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+								ORDER BY B.CREATE_DATE DESC, B.BOARD_NO DESC LIMIT 1
+								) BF
+							ON A.BOARD_TYPE = BF.BOARD_TYPE
+				<![CDATA[			
+				LEFT OUTER JOIN (SELECT B.* 
+								FROM INFO_BOARD B 
+								WHERE B.CREATE_DATE > #{createDate} AND B.BOARD_TYPE = #{boardType}  ]]>
+									<if test='kinds == "all"'>
+									AND ((B.TITLE LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.CREATE_ID LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.CONTENT LIKE CONCAT("%", #{searchTxt}, "%"))
+										)
+									</if>
+									<if test='kinds == "title" and searchTxt != null and searchTxt != ""'>
+										AND (B.TITLE LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "createId" and searchTxt != null and searchTxt !=""'>
+										AND (B.CREATE_ID LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "content" and searchTxt != null and searchTxt !=""'>
+										AND (B.CONTENT LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+								ORDER BY B.CREATE_DATE, B.BOARD_NO LIMIT 1	
+								) NT 	
+							ON A.BOARD_TYPE = NT.BOARD_TYPE
+				
+			WHERE 1=1
+				<if test='boardNo != null and boardNo !=""'>
+				AND A.BOARD_NO = #{boardNo}
+				</if>
+				<if test='boardType != null and boardType !=""'>
+				AND A.BOARD_TYPE = #{boardType}
+				</if>
+	</select>
+</mapper>

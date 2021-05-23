@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.account.dao.AccountMapper">
+	<select id="selectUserCnt" parameterType="egovframework.admin.account.vo.AccountVO" resultType="int">
+		SELECT 
+			COUNT(A.USER_ID) CNT
+		FROM G_USER A
+		WHERE 1=1
+		<if test='userIdNm != null and userIdNm != ""'> 
+			AND (USER_ID LIKE CONCAT("%", #{userIdNm}, "%") OR USER_NM LIKE CONCAT("%", #{userIdNm}, "%"))
+		</if>	
+		<if test='fromCreateDate != null and fromCreateDate != ""'> 
+		<![CDATA[
+			AND A.CREATE_DATE >= CONCAT(REPLACE(#{fromCreateDate}, '-', ''), '000000')
+		 ]]>
+		</if>
+		<if test='toCreateDate != null and toCreateDate != ""'> 
+		<![CDATA[
+			AND A.CREATE_DATE <= CONCAT(REPLACE(#{toCreateDate}, '-', ''), '000000')
+		 ]]>
+		</if>
+		<if test='author != null and author != ""'>
+			AND A.AUTHOR = #{author}
+		</if>
+		<if test='useYn != null and useYn != ""'>
+			AND A.USE_YN = #{useYn}
+		</if>
+	</select>
+	
+	<select id="selectUserList" parameterType="egovframework.admin.account.vo.AccountVO" resultType="hashMap">
+		SELECT
+			@ROWNUM := @ROWNUM + 1 AS ROW_NUM
+			, A.USER_ID
+			, A.USER_NM
+			, A.POSITION_NM
+			, A.AUTHOR
+			, (SELECT B.CODE_NM FROM COM_CODE B WHERE B.CODE_NO='USER' AND B.CODE_DTL=A.AUTHOR) AS AUTHOR_NM
+			, A.USE_YN
+			, (SELECT B.CODE_NM FROM COM_CODE B WHERE B.CODE_NO='USER' AND B.CODE_DTL=A.USE_YN) AS USE_NM			
+			, DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS CREATE_DATE
+		FROM 
+			G_USER A
+			, (SELECT @ROWNUM := 0) AS RN
+		WHERE 1=1
+		<if test='userIdNm != null and userIdNm != ""'> 
+			AND (A.USER_ID LIKE CONCAT("%", #{userIdNm}, "%") OR A.USER_NM LIKE CONCAT("%", #{userIdNm}, "%"))
+		</if>	
+		<if test='fromCreateDate != null and fromCreateDate != ""'> 
+		<![CDATA[
+			AND A.CREATE_DATE >= CONCAT(REPLACE(#{fromCreateDate}, '-', ''), '000000')
+		 ]]>
+		</if>
+		<if test='toCreateDate != null and toCreateDate != ""'> 
+		<![CDATA[
+			AND A.CREATE_DATE <= CONCAT(REPLACE(#{toCreateDate}, '-', ''), '000000')
+		 ]]>
+		</if>
+		<if test='author != null and author != ""'>
+			AND A.AUTHOR = #{author}
+		</if>
+		<if test='useYn != null and useYn != ""'>
+			AND A.USE_YN = #{useYn}
+		</if>
+		ORDER BY ROW_NUM DESC
+	</select>
+	
+	<delete id="secession" parameterType="egovframework.user.account.vo.AccountUserVO" >
+	DELETE FROM G_USER
+	WHERE USER_ID = #{userId}
+	</delete>
+	
+	<update id="useYnUpdate" parameterType="egovframework.user.account.vo.AccountUserVO" >
+	UPDATE G_USER
+		SET USE_YN='Y'
+	WHERE USER_ID=#{userId}	
+	</update>
+</mapper>

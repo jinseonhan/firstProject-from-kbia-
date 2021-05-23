@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.account.dao.AccountAUserMapper">
+	<select id="selectAUserCnt" parameterType="egovframework.admin.account.vo.AccountAUserVO" resultType="int">
+		SELECT 
+			COUNT(A.USER_ID) CNT
+		FROM A_USER A
+		WHERE 1=1
+		<if test='userIdNm != null and userIdNm != ""'> 
+			AND (A.USER_ID LIKE CONCAT("%", #{userIdNm}, "%") OR A.USER_NM LIKE CONCAT("%", #{userIdNm}, "%"))
+		</if>	
+			<!-- 날짜 사이 검색 -->
+			<if test='fromCreateDate != null and fromCreateDate != "" and toCreateDate != null and toCreateDate != ""'>
+            AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{fromCreateDate}, '-', '') AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{toCreateDate}, '-', '')
+         	</if>
+         	<if test='fromCreateDate != null and fromCreateDate != "" '>
+         	AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{fromCreateDate}, '-', '')  
+         	</if>       	
+         	<if test='toCreateDate != null and toCreateDate != "" '>
+         	AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{toCreateDate}, '-', '')  
+         	</if>
+		<if test='useYn != null and useYn != ""'>
+			AND A.USE_YN = #{useYn}
+		</if>
+	</select>
+	
+	<select id="selectAUserList" parameterType="egovframework.admin.account.vo.AccountAUserVO" resultType="hashMap">
+		SELECT
+			@ROWNUM := @ROWNUM + 1 AS ROW_NUM
+			, A.USER_ID
+			, A.USER_NM
+			, A.USE_YN
+			, A.CREATE_ID
+			, (SELECT B.CODE_NM FROM COM_CODE B WHERE B.CODE_NO='USER' AND A.USE_YN=B.CODE_DTL) AS USE_NM			
+			, DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS CREATE_DATE
+		FROM 
+			A_USER A
+			, (SELECT @ROWNUM := 0) AS RN
+		WHERE 1=1
+		<if test='userIdNm != null and userIdNm != ""'> 
+			AND (A.USER_ID LIKE CONCAT("%", #{userIdNm}, "%") OR A.USER_NM LIKE CONCAT("%", #{userIdNm}, "%"))
+		</if>	
+		<!-- 날짜 사이 검색 -->
+			<if test='fromCreateDate != null and fromCreateDate != "" and toCreateDate != null and toCreateDate != ""'>
+            AND A.CREATE_DATE <![CDATA[>=]]> REPLACE(#{fromCreateDate}, '-', '') AND A.CREATE_DATE <![CDATA[<=]]> REPLACE(#{toCreateDate}, '-', '')
+         	</if>
+         	<if test='fromCreateDate != null and fromCreateDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[>=]]> REPLACE(#{fromCreateDate}, '-', '')  
+         	</if>       	
+         	<if test='toCreateDate != null and toCreateDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[<=]]> REPLACE(#{toCreateDate}, '-', '')  
+         	</if>
+		<if test='useYn != null and useYn != ""'>
+			AND A.USE_YN = #{useYn}
+		</if>
+		ORDER BY A.USER_ID ASC
+	</select>
+	
+	<insert id="userASignUp" parameterType="egovframework.admin.account.vo.AccountAUserVO" >
+	INSERT INTO A_USER
+		(USER_ID, 
+		 PASSWD, 
+		 USER_NM,
+		 PER_TEL,
+		 EMAIL,
+		 AUTHOR,
+		  <if test='workTel != null and workTel != ""'>
+		 WORK_TEL, 
+		 </if>
+		 <if test='workAddr != null and workAddr != ""'>
+		 WORK_ADDR, 
+		 </if>
+		 CREATE_DATE, 
+		 UPDATE_DATE, 
+		 CREATE_ID, 
+		 UPDATE_ID,
+		 USE_YN
+		 )
+	VALUES
+		(#{userId},
+		 #{passwd},
+		 #{userNm},
+		 #{perTel},
+		 #{email},
+		 #{author},
+		 <if test='workTel != null and workTel != ""'> 
+		 #{workTel},
+		 </if>
+		 <if test='workAddr != null and workAddr != ""'> 
+		 #{workAddr},
+		 </if>
+		 DATE_FORMAT(now(), '%Y%m%d%H%i%s'), 
+		 DATE_FORMAT(now(), '%Y%m%d%H%i%s'), 
+		 #{userId},
+		 #{userId},
+		 'Y'
+		 )
+	</insert>
+	
+	<select id="selectAdminLoginInfo" parameterType="egovframework.admin.account.vo.AccountAUserVO" resultType="map">
+			SELECT 
+					USER_ID
+				   ,USER_NM 
+				   ,WORK_ADDR 
+				   ,AUTHOR
+				   <!-- ,CAST(AES_DECRYPT(UNHEX(WORK_TEL), 'WooriDevEncKey') as CHAR) AS WORK_TEL 
+				   ,CAST(AES_DECRYPT(UNHEX(PER_TEL), 'WooriDevEncKey') as CHAR) AS PER_TEL	   -->
+				   ,WORK_TEL
+				   ,PER_TEL
+				   ,EMAIL
+				   ,UPDATE_DATE 
+				   ,UPDATE_ID
+				   ,USE_YN 
+			FROM A_USER
+			WHERE 1=1
+			<if test='userId != null and userId != ""'> 
+			AND USER_ID = #{userId}
+			</if>
+			<if test='userNm != null and userNm != ""'> 
+			AND USER_NM = #{userNm}
+			</if>
+			<if test='email != null and email != ""'> 
+			AND EMAIL = #{email}
+			</if>
+	</select>
+	<update id="AuserAccountUpdate" parameterType="egovframework.admin.account.vo.AccountAUserVO" >
+	UPDATE A_USER
+	SET	
+		USE_YN=#{useYn},
+		<if test='userNm != null and userNm != ""'> 
+		USER_NM=#{userNm}, 
+		</if>
+		<if test='passwd != null and passwd != ""'> 
+		PASSWD=#{passwd}, 
+		</if>
+		<if test='workAddr != null and workAddr != ""'> 
+		WORK_ADDR=#{workAddr}, 
+		</if>
+		<if test='author != null and author != ""'> 
+		AUTHOR=#{author}, 
+		</if>
+		<if test='workTel != null and workTel != ""'> 
+		<!-- WORK_TEL=HEX(AES_ENCRYPT(#{workTel}, 'WooriDevEncKey')),  -->
+		WORK_TEL=#{workTel},
+		</if>
+		<if test='perTel != null and perTel != ""'> 
+		PER_TEL=#{perTel},
+		<!-- PER_TEL=HEX(AES_ENCRYPT(#{perTel}, 'WooriDevEncKey')), --> 
+		</if>
+		<if test='email != null and email != ""'> 
+		EMAIL=#{email}, 
+		</if>
+		UPDATE_DATE= DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	WHERE USER_ID=#{userId}
+	</update>
+	
+	<delete id="AUsersecession" parameterType="egovframework.admin.account.vo.AccountAUserVO" >
+	DELETE FROM A_USER
+		   WHERE USER_ID = #{userId}
+	</delete>
+	
+</mapper>

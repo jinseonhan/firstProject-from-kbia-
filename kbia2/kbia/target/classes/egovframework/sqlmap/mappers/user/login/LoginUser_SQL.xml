@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.user.login.dao.LoginUserMapper">
+	
+	<select id="selectLoginUserChk" parameterType="egovframework.user.login.vo.LoginUserVO" resultType="int">
+			SELECT COUNT(USER_ID) CNT
+			FROM G_USER
+			
+			WHERE 1=1
+			<if test='userId != null and userId != ""'> 
+				AND USER_ID = #{userId}
+			</if>
+			<if test='passwd != null and passwd != ""'> 
+				AND PASSWD = #{passwd}		
+			</if>	
+	</select>
+	<select id="selectLoginInfo" parameterType="egovframework.user.account.vo.AccountUserVO" resultType="map">
+		
+			SELECT USER_ID
+				   ,USER_NM 
+				   ,WORK_TYPE_NM 
+				   ,POSITION_NM 
+				   ,WORK_ADDR 
+				   ,AUTHOR
+				   ,CAST(AES_DECRYPT(UNHEX(HOME_TEL), 'WooriDevEncKey') as CHAR) AS HOME_TEL
+				   ,CAST(AES_DECRYPT(UNHEX(WORK_TEL), 'WooriDevEncKey') as CHAR) AS WORK_TEL
+				   ,CAST(AES_DECRYPT(UNHEX(PER_TEL), 'WooriDevEncKey') as CHAR) AS PER_TEL
+				   
+				   ,EMAIL
+				   ,FILE_NO 
+				   ,CREATE_DATE 
+				   ,DATE_FORMAT(STR_TO_DATE(CREATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS FORM_CREATE_DATE
+				   ,UPDATE_DATE 
+				   ,CREATE_ID
+				   ,UPDATE_ID 
+				   ,ADDRESS
+				   ,ADDRESS_NO 
+				   ,ADDRESS_DTL
+			FROM G_USER
+			WHERE 1=1
+			<if test='userId != null and userId != ""'> 
+			AND USER_ID = #{userId}
+			</if>
+			<if test='userNm != null and userNm != ""'> 
+			AND USER_NM = #{userNm}
+			</if>
+			<if test='email != null and email != ""'> 
+			AND EMAIL = #{email}
+			</if>
+	</select>
+</mapper>

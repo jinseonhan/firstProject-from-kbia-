@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.info.dao.BatteryMapper">
+	
+	<!-- The Battery 조회  -->
+	
+	<select id="selectBatteryList" parameterType="egovframework.admin.info.vo.InfoVO" resultType="hashMap">
+			SELECT 
+				@ROWNUM := @ROWNUM + 1 AS ROW_NUM
+				,BOARD_NO
+				,BOARD_TYPE
+				,TITLE
+				,USE_YN
+				,(SELECT C.CODE_NM FROM COM_CODE C WHERE LANGUAGE_TYPE = C.CODE_DTL AND C.CODE_NO='COMM') AS LANGUAGE_TYPE
+				,CREATE_ID
+				,DATE_FORMAT(STR_TO_DATE(CREATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS CREATE_DATE
+			FROM 
+				INFO_BOARD 
+				, (SELECT @ROWNUM :=0) AS RN
+			WHERE 1=1
+				AND BOARD_TYPE = 'BATTERY'
+			<if test='boardNo != null and boardNo !=""'>
+				AND BOARD_No = #{boardNo}
+			</if>
+			<choose>
+				<!-- 날짜 사이 검색 -->
+				<when test='startBatteryDate != null and startBatteryDate != "" and endBatteryDate != null and endBatteryDate != ""'>
+					AND CREATE_DATE <![CDATA[>=]]> CONCAT(REPLACE(#{startBatteryDate}, '-', ''), '000000') AND CREATE_DATE <![CDATA[<=]]> CONCAT(REPLACE(#{endBatteryDate}, '-', ''), '235959')
+				</when>				
+				<otherwise>
+					AND CREATE_DATE BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y%m%d%H%i%s') AND DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
+				</otherwise>
+			</choose>
+			<!-- 제목 검색 -->
+			<if test='batteryTitle != null and batteryTitle !=""'>
+				AND TITLE LIKE CONCAT("%", #{batteryTitle} , "%")
+			</if>
+			<!-- 사용여부 검색 -->
+			<if test='batteryUse != null and batteryUse != ""'>
+				AND USE_YN = #{batteryUse}
+			</if>
+			<!-- 언어 검색 -->
+			<if test='batteryLanguage != null and batteryLanguage != ""'>
+				AND LANGUAGE_TYPE = #{batteryLanguage}
+			</if>
+			ORDER BY ROW_NUM DESC
+	</select>
+	<!-- 수정페이지 조회 -->
+	<select id="selectUpdateBattery" parameterType="egovframework.admin.info.vo.InfoVO" resultType="map">
+		SELECT
+			BOARD_NO
+			,BOARD_TYPE
+			,TITLE
+			,CONTENT
+			,USE_YN
+			,LANGUAGE_TYPE
+			,CREATE_ID
+			,DATE_FORMAT(STR_TO_DATE(CREATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS CREATE_DATE
+			,DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%Y-%m-%d') AS START_DT
+			,DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%H') AS START_HOUR
+			,DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d%H%i%S'), '%i') AS START_MINUTE
+			,DATE_FORMAT(STR_TO_DATE(UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS UPDATE_DATE
+		FROM
+			INFO_BOARD
+		WHERE 1=1
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+	</select>
+	
+	
+	
+	<!-- 등록 -->
+	<insert id="batteryRegist" parameterType="egovframework.admin.info.vo.InfoVO">
+		INSERT INTO INFO_BOARD (
+	  		BOARD_NO
+	   		, BOARD_TYPE
+	   		, TITLE
+	   		, CONTENT       		
+       		, CREATE_DATE
+       		, UPDATE_DATE
+       		, START_DT
+	   		, LANGUAGE_TYPE
+	   		, USE_YN
+		)
+		SELECT 
+	   		#{boardNo}
+	   		, #{boardType}
+	   		, #{batteryTitle}
+	   		, #{content}	   		
+	   		, DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
+	   		, DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
+	   		, CONCAT(REPLACE(#{batteryDate},'-',''),#{batteryHour},#{batteryMinute},'00')
+	   		, #{languageType}
+	   		, #{useYn}	   		
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="batteryUpdate" parameterType="egovframework.admin.info.vo.InfoVO">
+	UPDATE INFO_BOARD 
+	SET
+		BOARD_TYPE = #{boardType},
+		TITLE = #{batteryTitle},
+		CONTENT = #{batteryContent},
+		UPDATE_DATE  = 	DATE_FORMAT(now(), '%Y%m%d%H%i%s'),
+		<if test='batteryDate != null and batteryDate != "" and batteryHour != null and batteryHour != "" and batteryMinute != null and batteryMinute != ""'> 
+		START_DT = 	CONCAT(REPLACE(#{batteryDate},'-',''),#{batteryHour},#{batteryMinute},'00'),
+		</if>
+		USE_YN  = #{useYn},
+		LANGUAGE_TYPE  = #{languageType}
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+	<!-- 삭제 -->
+	<delete id ="batteryDelete" parameterType="egovframework.admin.info.vo.InfoVO">
+		DELETE FROM INFO_BOARD
+		<if test = 'boardNo != null and boardNo != ""'>
+		WHERE BOARD_NO = #{boardNo}
+		</if>
+		<if test = 'boardNo != null and boardNo != ""'>
+		AND BOARD_TYPE = #{boardType} 
+		</if>
+	</delete>
+</mapper>

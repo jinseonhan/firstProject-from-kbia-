@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.login.dao.LoginMapper">
+	<select id="selectLoginChk" parameterType="egovframework.admin.login.vo.LoginVO" resultType="int">
+			SELECT 
+				COUNT(USER_ID) AS LOGIN_YN
+			FROM A_USER
+			WHERE 1=1
+			AND USER_ID = #{userId}
+			AND PASSWD = #{passwd}
+	</select>
+	
+	<select id="selectAdminLoginInfo" parameterType="egovframework.user.account.vo.AccountUserVO" resultType="map">
+		
+			SELECT USER_ID
+				   ,USER_NM 
+				   ,WORK_TYPE_NM 
+				   ,POSITION_NM 
+				   ,WORK_ADDR 
+				   ,AUTHOR
+				   ,CAST(AES_DECRYPT(UNHEX(HOME_TEL), 'WooriDevEncKey') as CHAR) AS HOME_TEL
+				   ,CAST(AES_DECRYPT(UNHEX(WORK_TEL), 'WooriDevEncKey') as CHAR) AS WORK_TEL
+				   ,CAST(AES_DECRYPT(UNHEX(PER_TEL), 'WooriDevEncKey') as CHAR) AS PER_TEL	   
+				   ,EMAIL
+				   ,CREATE_DATE 
+				   ,UPDATE_DATE 
+				   ,CREATE_ID
+				   ,UPDATE_ID 
+			FROM A_USER
+			WHERE 1=1
+			<if test='userId != null and userId != ""'> 
+			AND USER_ID = #{userId}
+			</if>
+			<if test='userNm != null and userNm != ""'> 
+			AND USER_NM = #{userNm}
+			</if>
+			<if test='email != null and email != ""'> 
+			AND EMAIL = #{email}
+			</if>
+	</select>
+</mapper>

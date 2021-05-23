@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.user.account.dao.AccountUserMapper">
+	<select id="accountCntChk" parameterType="egovframework.user.account.vo.AccountUserVO" resultType="int">
+	SELECT COUNT(USER_ID) CNT
+	FROM G_USER
+	WHERE 1=1
+	<if test='email != null and email != ""'> 
+		AND EMAIL = #{email}
+	</if>
+	<if test='userId != null and userId != ""'> 
+		AND USER_ID = #{userId}
+	</if>
+	<if test='userNm != null and userNm != ""'> 
+		AND USER_NM = #{userNm}
+	</if>
+	</select>
+	
+	<insert id="userSignUp" parameterType="egovframework.user.account.vo.AccountUserVO" >
+	INSERT INTO G_USER
+		(USER_ID, 
+		 PASSWD, 
+		 USER_NM, 
+		 <if test='workTypeNm != null and workTypeNm != ""'> 
+		 WORK_TYPE_NM, 
+		 </if>
+		 <if test='positionNm != null and positionNm != ""'> 
+		 POSITION_NM, 
+		 </if>
+		 <if test='workAddr != null and workAddr != ""'>
+		 WORK_ADDR, 
+		 </if>
+		 <if test='author != null and author != ""'>
+		 AUTHOR, 
+		 </if>
+		 <if test='homeTel != null and homeTel != ""'>
+		 HOME_TEL, 
+		 </if>
+		 <if test='workTel != null and workTel != ""'>
+		 WORK_TEL, 
+		 </if>
+		 <if test='perTel != null and perTel != ""'>
+		 PER_TEL, 
+		 </if>
+		 <if test='email != null and email != ""'>
+		 EMAIL, 
+		 </if>
+		 <if test='fileNo != null and fileNo != ""'>
+		 FILE_NO,
+		 </if>
+		 <if test='address != null and address != ""'>
+		 ADDRESS, 
+		 </if>
+		 <if test='addressNo != null and addressNo != ""'>
+		 ADDRESS_NO, 
+		 </if>
+		 <if test='addressDtl != null and addressDtl != ""'>
+		 ADDRESS_DTL,
+		 </if>
+		 CREATE_DATE, 
+		 UPDATE_DATE, 
+		 CREATE_ID, 
+		 UPDATE_ID 
+		 )
+	VALUES
+		(#{userId},
+		 #{passwd},
+		 #{userNm},
+		 <if test='workTypeNm != null and workTypeNm != ""'> 
+		 #{workTypeNm},
+		 </if> 
+		 <if test='positionNm != null and positionNm != ""'> 
+		 #{positionNm},
+		 </if> 
+		 <if test='workAddr != null and workAddr != ""'> 
+		 #{workAddr},
+		 </if> 
+		 <if test='author != null and author != ""'> 
+		 #{author},
+		 </if> 
+		 <if test='homeTel != null and homeTel != ""'> 
+		 HEX(AES_ENCRYPT(#{homeTel}, 'WooriDevEncKey')),
+		 </if> 
+		 <if test='workTel != null and workTel != ""'> 
+		 HEX(AES_ENCRYPT(#{workTel}, 'WooriDevEncKey')),
+		 </if> 
+		 <if test='perTel != null and perTel != ""'> 
+		 HEX(AES_ENCRYPT(#{perTel}, 'WooriDevEncKey')),
+		 </if> 
+		 <if test='email != null and email != ""'> 
+		 #{email},
+		 </if> 
+		 <if test='fileNo != null and fileNo != ""'> 
+		 #{fileNo},
+		 </if> 
+		 <if test='address != null and address != ""'> 
+		 #{address},
+		 </if> 
+		 <if test='addressNo != null and addressNo != ""'> 
+		 #{addressNo},
+		 </if> 
+		 <if test='addressDtl != null and addressDtl != ""'> 
+		 #{addressDtl},
+		 </if> 
+		 DATE_FORMAT(now(), '%Y%m%d%H%i%s'), 
+		 DATE_FORMAT(now(), '%Y%m%d%H%i%s'), 
+		 #{userId}, 
+		 #{userId} 
+		 )
+	</insert>
+	
+	<update id="userAccountUpdate" parameterType="egovframework.user.account.vo.AccountUserVO" >
+	UPDATE G_USER
+	SET
+		<if test='userNm != null and userNm != ""'> 
+		USER_NM=#{userNm}, 
+		</if>
+		<if test='passwd != null and passwd != ""'> 
+		PASSWD=#{passwd}, 
+		</if>
+		<if test='workTypeNm != null and workTypeNm != ""'> 
+		WORK_TYPE_NM=#{workTypeNm}, 
+		</if>
+		<if test='positionNm != null and positionNm != ""'> 
+		POSITION_NM=#{positionNm}, 
+		</if>
+		<if test='workAddr != null and workAddr != ""'> 
+		WORK_ADDR=#{workAddr}, 
+		</if>
+		<if test='author != null and author != ""'> 
+		AUTHOR=#{author}, 
+		</if>
+		<if test='homeTel != null and homeTel != ""'> 
+		HOME_TEL=HEX(AES_ENCRYPT(#{homeTel}, 'WooriDevEncKey')), 
+		</if>
+		<if test='workTel != null and workTel != ""'> 
+		WORK_TEL=HEX(AES_ENCRYPT(#{workTel}, 'WooriDevEncKey')), 
+		</if>
+		<if test='perTel != null and perTel != ""'> 
+		PER_TEL=HEX(AES_ENCRYPT(#{perTel}, 'WooriDevEncKey')), 
+		</if>
+		<if test='email != null and email != ""'> 
+		EMAIL=#{email}, 
+		</if>
+		<if test='fileNo != null and fileNo != ""'> 
+		FILE_NO=#{fileNo}, 
+		</if>
+		<if test='address != null and address != ""'>  
+		ADDRESS=#{address}, 
+		</if>
+		<if test='addressNo != null and addressNo != ""'> 
+		ADDRESS_NO=#{addressNo}, 
+		</if>
+		<if test='addressDtl != null and addressDtl != ""'> 
+		ADDRESS_DTL=#{addressDtl},
+		</if>
+		UPDATE_DATE= DATE_FORMAT(now(), '%Y%m%d%H%i%s'),
+		UPDATE_ID= DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	WHERE USER_ID=#{userId}
+	</update>
+	
+	<delete id="secession" parameterType="egovframework.user.account.vo.AccountUserVO" >
+	DELETE FROM G_USER
+		   WHERE USER_ID = #{userId}
+		     AND PASSWD  = #{passwd}
+	</delete>
+</mapper>

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.member.dao.MemberAdminMapper">
+
+	<select id="selectmemberList" parameterType="egovframework.admin.member.vo.MemberAdminVO" resultType="hashMap">
+			SELECT
+				@ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				A.BOARD_NO,
+				(SELECT 
+					B.CODE_NM 
+				FROM 
+					kbia.COM_CODE AS B 
+				WHERE 
+					B.CODE_NO='COMM' AND B.CODE_DTL=A.LANGUAGE_TYPE) AS LANGUAGE_TYPE,
+				(SELECT 
+					B.CODE_NM 
+				FROM 
+					kbia.COM_CODE AS B 
+				WHERE 
+					B.CODE_NO='MEMBER' AND B.CODE_DTL=A.DIVISION) AS DIVISION,
+				A.COM_NM,
+				A.USE_YN,
+				A.CREATE_ID,
+				DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d %H:%i:%S') AS CREATE_DATE
+			FROM
+				kbia.MEMBER_BOARD A
+				, (SELECT @ROWNUM :=0) AS RN
+			WHERE 1=1
+				AND A.BOARD_TYPE='MEMBER'
+			<!-- 날짜 사이 검색 -->
+			<if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+            AND A.CREATE_DATE <![CDATA[>=]]> CONCAT(REPLACE(#{startDate}, '-', ''),'000000') AND A.CREATE_DATE <![CDATA[<=]]> CONCAT(REPLACE(#{endDate}, '-', ''),'235959')
+         	</if>
+         	<if test='startDate != null and startDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[>=]]> CONCAT(REPLACE(#{startDate}, '-', ''),'000000')  
+         	</if>       	
+         	<if test='endDate != null and endDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[<=]]> CONCAT(REPLACE(#{endDate}, '-', ''),'235959')  
+         	</if>
+	 		<if	test='comNm!=null and comNm!=""'>
+				AND A.COM_NM LIKE CONCAT("%", #{comNm}, "%")
+			</if>			
+			 <if test='division!="" and division!=null'>
+				AND A.DIVISION = #{division}
+			</if>
+			<if test='useYn!="" and useYn!=null'>
+				AND A.USE_YN = #{useYn}
+			</if>
+			<if test='languageType!="" and languageType!=null'>
+				AND A.LANGUAGE_TYPE = #{languageType}
+			</if>
+			ORDER BY A.BOARD_NO DESC
+	</select>
+<!-- 	<select id="selectmemberList" parameterType="egovframework.admin.member.vo.MemberAdminVO" resultType="hashMap">
+			SELECT
+				@ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				A.BOARD_NO,
+				A.LANGUAGE_TYPE,
+				(SELECT 
+					B.CODE_NM 
+				FROM 
+					kbia.COM_CODE AS B 
+				WHERE 
+					B.CODE_NO='MEMBER' AND B.CODE_DTL=A.DIVISION) AS DIVISION,
+				A.COM_NM,
+				A.USE_YN,
+				A.CREATE_ID,
+				DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d %H:%i:%S') AS CREATE_DATE
+			FROM
+				kbia.MEMBER_BOARD A
+				, (SELECT @ROWNUM :=0) AS RN
+			WHERE 1=1
+				AND A.BOARD_TYPE='MEMBER'
+			날짜 사이 검색
+			<if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+            AND A.CREATE_DATE <![CDATA[>=]]> CONCAT(REPLACE(#{startDate}, '-', ''),'000000') AND A.CREATE_DATE <![CDATA[<=]]> CONCAT(REPLACE(#{endDate}, '-', ''),'235959')
+         	</if>
+         	<if test='startDate != null and startDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[>=]]> CONCAT(REPLACE(#{startDate}, '-', ''),'000000')  
+         	</if>       	
+         	<if test='endDate != null and endDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[<=]]> CONCAT(REPLACE(#{endDate}, '-', ''),'235959')  
+         	</if>
+	 		<if	test='comNm!=null and comNm!=""'>
+				AND A.COM_NM LIKE CONCAT("%", #{comNm}, "%")
+			</if>			
+			 <if test='division!="" and division!=null'>
+				AND A.DIVISION = #{division}
+			</if>
+			<if test='useYn!="" and useYn!=null'>
+				AND A.USE_YN = #{useYn}
+			</if>
+			<if test='languageType!="" and languageType!=null'>
+				AND A.LANGUAGE_TYPE = #{languageType}
+			</if>
+			ORDER BY A.BOARD_NO DESC
+	</select> -->
+<!-- 	<select id="selectmemberList" parameterType="egovframework.admin.member.vo.MemberAdminVO" resultType="hashMap">
+			SELECT
+				@ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				A.BOARD_NO,
+				A.LANGUAGE_TYPE,
+				A.DIVISION,
+				A.COM_NM,
+				A.USE_YN,
+				A.CREATE_ID,
+				DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d %H:%i:%S') AS CREATE_DATE
+			FROM
+				kbia.MEMBER_BOARD A
+				, (SELECT @ROWNUM :=0) AS RN
+			WHERE 1=1
+				AND A.BOARD_TYPE='MEMBER'
+			날짜 사이 검색
+			<if test='startDate != null and startDate != "" and endDate != null and endDate != ""'>
+            AND A.CREATE_DATE <![CDATA[>=]]> REPLACE(#{startDate}, '-', '') AND A.CREATE_DATE <![CDATA[<=]]> REPLACE(#{endDate}, '-', '')
+         	</if>
+         	<if test='startDate != null and startDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[>=]]> REPLACE(#{startDate}, '-', '')  
+         	</if>       	
+         	<if test='endDate != null and endDate != "" '>
+         	AND A.CREATE_DATE <![CDATA[<=]]> REPLACE(#{endDate}, '-', '')  
+         	</if>
+	 		<if	test='comNm!=null and comNm!=""'>
+				AND A.COM_NM LIKE CONCAT("%", #{comNm}, "%")
+			</if>			
+			 <if test='division!="" and division!=null'>
+				AND A.DIVISION = #{division}
+			</if>
+			<if test='useYn!="" and useYn!=null'>
+				AND A.USE_YN = #{useYn}
+			</if>
+			<if test='languageType!="" and languageType!=null'>
+				AND A.LANGUAGE_TYPE = #{languageType}
+			</if>
+			ORDER BY A.BOARD_NO DESC
+	</select> -->
+	<select id="loadAdminMember" parameterType="egovframework.admin.member.vo.MemberAdminVO" resultType="hashMap">
+			SELECT
+				A.CREATE_ID,
+				A.HOMEPAGE,
+				A.CONTENT,
+				A.MULTI_FILE_NO,
+				A.USE_YN,
+				A.LANGUAGE_TYPE,
+				A.DIVISION,
+				A.COM_NM,
+				A.COM_REPRE_NM,
+				A.SECTORS,
+				A.EST_YEAR,
+				A.COM_EMPL_CNT,
+				A.COM_REPRE_NUM,
+				A.FAX,
+				A.UPDATE_DATE,
+				B.OGN_FILE_NM				
+			FROM
+				MEMBER_BOARD AS A
+			LEFT JOIN
+				(SELECT OGN_FILE_NM,REF_IDX FROM TB_FILE_MNG WHERE DEL_YN='N' AND REF_TYPE='MEMBER') AS B
+			ON
+				A.BOARD_NO=B.REF_IDX
+			WHERE 
+				A.BOARD_NO =#{boardNo}
+	</select>
+
+	<insert id="memberAdminRegist" parameterType="egovframework.admin.member.vo.MemberAdminVO">
+		INSERT INTO MEMBER_BOARD(
+	  		BOARD_NO,
+	   		BOARD_TYPE,
+	   		CREATE_ID,
+	   		HOMEPAGE,
+	  	 	CONTENT, 
+	   		CREATE_DATE,
+	   		UPDATE_DATE,
+	  		USE_YN,
+	  		LANGUAGE_TYPE,
+	  		DIVISION,
+	  		COM_NM,
+	  		COM_REPRE_NM,
+	  		SECTORS,
+	  		EST_YEAR,
+	  		COM_EMPL_CNT,
+	  		COM_REPRE_NUM,
+	  		FAX,
+	  		VIEW_CNT
+			) 
+		SELECT
+		   	#{boardNo},
+	   		#{boardType},
+	   		#{createId},
+	   		#{homePage},
+	   		#{content},
+			DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'),
+	   		DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'),
+	   		#{useYn},
+	   		<!-- #{languageType}, --> 
+	   		#{languageType},
+	   		<!-- #{division},-->
+	   		#{division},
+	   		#{comNm},
+	   		#{comRepreNm},
+	   		#{sectors},
+	   		#{estYear},
+	   		#{comEmplCnt},
+	   		#{comRepreNum},
+	   		#{faxNum},
+	   		'0'
+	</insert>
+	
+	<update id="memberAdminReviseUpdate" parameterType="egovframework.admin.member.vo.MemberAdminVO">
+		UPDATE 
+			MEMBER_BOARD
+		SET
+			HOMEPAGE=#{homePage},
+			COM_REPRE_NM=#{comRepreNm},
+			CONTENT=#{content},
+			MULTI_FILE_NO=#{multiFileNo},
+			UPDATE_DATE=DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'),
+			USE_YN=#{useYn},
+			DIVISION=#{division},
+			COM_NM=#{comNm},
+			SECTORS=#{sectors},
+			COM_EMPL_CNT=#{comEmplCnt},
+			COM_REPRE_NUM=#{comRepreNum},
+			FAX=#{faxNum},
+			EST_YEAR=#{estYear},
+			LANGUAGE_TYPE=#{languageType},
+			UPDATE_ID=#{userId}
+		WHERE
+			BOARD_NO=#{boardNo}
+	</update>
+	<delete id="memberAdminUserDelete" parameterType="egovframework.admin.member.vo.MemberAdminVO">
+		DELETE 
+		FROM
+			MEMBER_BOARD
+		WHERE
+			BOARD_NO=#{boardNo}
+		AND
+			BOARD_TYPE='MEMBER'
+	</delete>
+	
+</mapper>

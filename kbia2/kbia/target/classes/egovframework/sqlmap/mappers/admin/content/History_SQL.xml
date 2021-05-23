@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.content.dao.HistoryMapper">
+	<!-- <select id="selectUserCnt" parameterType="egovframework.admin.account.vo.AccountVO" resultType="int">
+			SELECT COUNT(USER_ID) CNT
+			FROM G_USER
+			WHERE 1=1
+			<if test='userIdNm != null and userIdNm != ""'> 
+				AND ( USER_ID LIKE CONCAT("%", #{userIdNm} , "%") OR USER_NM LIKE CONCAT("%", #{userIdNm} , "%") )
+			</if>	
+	</select>
+	 -->
+	<select id="selectHistoryList" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 (SELECT C.CODE_NM FROM COM_CODE C WHERE LANGUAGE_TYPE = C.CODE_DTL AND C.CODE_NO='COMM') AS LANGUAGE_TYPE,
+				 CONCAT(SUBSTR(YEARMONTH,1,4), ' / ' ,SUBSTR(YEARMONTH,5,6)) AS YEARMONTH,
+				 TITLE, 
+				 USE_YN,
+				 DATE_FORMAT(STR_TO_DATE(CREATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS CREATE_DATE,		
+				 DIVISION
+			
+			FROM 
+				CONTENT_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			<if test='division != null and division !=""'>
+			AND DIVISION = #{division}
+			</if>
+			
+	
+			
+			<if test='regStartDate != null and regStartDate != "" and regEndDate != null and regEndDate != ""'>
+            <!-- 
+            AND UPDATE_DATE BETWEEN REPLACE(#{startBriefDate}, '-', '') AND REPLACE(#{endBriefDate}, '-', '')
+             -->
+            AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{regStartDate}, '-', '') AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{regEndDate}, '-', '')
+         	</if>
+         	
+         	<if test='regStartDate != null and regStartDate != "" '>
+         	AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{regStartDate}, '-', '')  
+         	</if>
+         	
+         	<if test='regEndDate != null and regEndDate != "" '>
+         	AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{regEndDate}, '-', '')  
+         	</if>
+			
+			<if test='useYn != null and useYn != ""'>
+			AND (USE_YN LIKE CONCAT("%", #{useYn}, "%"))
+			</if>
+			<if test='languageType != null and languageType != ""' >
+			AND (LANGUAGE_TYPE LIKE CONCAT("%", #{languageType}, "%"))
+			</if>	
+			
+			<if test='title != null and title != ""'>
+			AND (TITLE LIKE CONCAT("%", #{title}, "%"))
+			</if>
+			ORDER BY CREATE_DATE DESC
+	</select>
+	
+	
+	
+	<insert id="historyRegist" parameterType="egovframework.admin.content.vo.ContentVO">
+		INSERT INTO CONTENT_BOARD  (
+	  		 BOARD_NO  
+	   		, BOARD_TYPE
+	   		, CREATE_ID
+	   		, DIVISION
+	   		, YEARMONTH
+	   		, TITLE
+	   		, LANGUAGE_TYPE
+	   		, USE_YN
+	   		, CREATE_DATE
+	   		, UPDATE_DATE
+	   		 		
+		) 
+		SELECT 
+			 #{boardNo}
+	   		, #{boardType}
+	   		, #{createId}
+	   		, #{division}
+	   		, CONCAT(#{historyY}, #{historyM})
+	   		, #{title}
+	   		, #{languageType}
+	   		, #{useYn}
+	   		, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	   		, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	</insert>
+	
+	
+	
+	
+	
+	<select id="selectHistory" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 BOARD_NO,
+				 BOARD_TYPE,
+				 LANGUAGE_TYPE,
+				 SUBSTR(YEARMONTH,1,4) AS HISTORY_Y,
+				 SUBSTR(YEARMONTH,5,6) AS HISTORY_M,
+				 TITLE, 
+				 USE_YN,
+				 DIVISION,
+				 CREATE_ID,
+				 DATE_FORMAT(STR_TO_DATE(UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y-%m-%d %H:%i:%S') AS UPDATE_DATE
+			
+			FROM 
+				CONTENT_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1 
+			
+			<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+			<if test='division != null and division !=""'>
+			AND DIVISION = #{division}
+			</if>
+			
+			ORDER BY ROW_NUM DESC
+	</select>
+	
+	
+	
+	<delete id="deleteHistory">
+	
+	
+	DELETE FROM CONTENT_BOARD
+	
+	where 1=1
+	
+	<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+	
+	
+	</delete>
+	
+	
+	<update id="historyupdate" parameterType="egovframework.admin.content.vo.ContentVO">
+	
+	UPDATE CONTENT_BOARD SET
+	
+	BOARD_TYPE = #{boardType},
+	CREATE_ID = #{createId},
+	DIVISION = #{division},
+	YEARMONTH = CONCAT(#{historyY},#{historyM}),
+	TITLE = #{title},
+	LANGUAGE_TYPE = #{languageType},
+	USE_YN = #{useYn},
+	CREATE_DATE = DATE_FORMAT(now(), '%Y%m%d'),
+	UPDATE_DATE = DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	where 1=1
+	<if test='boardNo != null and boardNo !=""'>
+			AND BOARD_NO = #{boardNo}
+			</if>
+			<if test='boardType != null and boardType !=""'>
+			AND BOARD_TYPE = #{boardType}
+			</if>
+	
+	</update>
+	
+	
+	
+</mapper>

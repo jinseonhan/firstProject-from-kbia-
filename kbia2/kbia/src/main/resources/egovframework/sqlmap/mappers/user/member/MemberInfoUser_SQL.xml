@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.user.member.dao.MemberMapper">
+	<!-- <select id="selectUserCnt" parameterType="egovframework.admin.account.vo.AccountVO" resultType="int">
+			SELECT COUNT(USER_ID) CNT
+			FROM G_USER
+			WHERE 1=1
+			<if test='userIdNm != null and userIdNm != ""'> 
+				AND ( USER_ID LIKE CONCAT("%", #{userIdNm} , "%") OR USER_NM LIKE CONCAT("%", #{userIdNm} , "%") )
+			</if>	
+	</select>
+	 -->
+	 
+	 
+	<select id="selectFcMemList" parameterType="egovframework.user.member.vo.MemberVO" resultType="hashMap">
+			SELECT
+			 A.BOARD_NO,
+			 A.BOARD_TYPE,
+			 A.CREATE_ID, 
+			 A.HOMEPAGE,
+			 A.SECTORS,
+			 A.COM_NM,
+			 IDX,
+			 ST_FILE_NM,
+			 REF_TYPE,
+			 TFM.REF_IDX,
+			 A.COM_REPRE_NM,
+			 A.EST_YEAR,
+			 A.COM_EMPL_CNT,
+			 A.COM_REPRE_NUM,
+			 A.FAX,
+			 A.USE_YN,
+			 A.DIVISION,
+			 A.CREATE_DATE AS ORG_CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS UPDATE_DATE
+		FROM 
+			MEMBER_BOARD A
+			RIGHT JOIN TB_FILE_MNG TFM
+			ON A.BOARD_NO = TFM.REF_IDX
+			, (SELECT @ROWNUM := 0) AS RN 
+		WHERE 1=1
+			AND DIVISION = "M1"
+			<if test='kinds == "all"'>
+				AND ((A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+					)
+			</if>
+			<if test='kinds == "name" and searchTxt != null and searchTxt != ""'>
+				AND (A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "ceo" and searchTxt != null and searchTxt !=""'>
+				AND (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "sectors" and searchTxt != null and searchTxt !=""'>
+				AND (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='boardType != null and boardType !=""'>
+				AND A.BOARD_TYPE = #{boardType}
+			</if>
+			ORDER BY CREATE_DATE DESC, A.BOARD_NO DESC
+	</select>
+	
+	<select id="selectBcMemList" parameterType="egovframework.user.member.vo.MemberVO" resultType="hashMap">
+			SELECT
+			 A.BOARD_NO,
+			 A.BOARD_TYPE,
+			 A.CREATE_ID, 
+			 A.HOMEPAGE,
+			 A.SECTORS,
+			 A.COM_NM,
+			 IDX,
+			 ST_FILE_NM,
+			 REF_TYPE,
+			 TFM.REF_IDX,
+			 A.COM_REPRE_NM,
+			 A.EST_YEAR,
+			 A.COM_EMPL_CNT,
+			 A.COM_REPRE_NUM,
+			 A.FAX,
+			 A.USE_YN,
+			 A.DIVISION,
+			 A.CREATE_DATE AS ORG_CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS UPDATE_DATE
+		FROM 
+			MEMBER_BOARD A
+			RIGHT JOIN TB_FILE_MNG TFM
+			ON A.BOARD_NO = TFM.REF_IDX
+			, (SELECT @ROWNUM := 0) AS RN 
+		WHERE 1=1
+			AND DIVISION = "M2"
+			<if test='kinds == "all"'>
+				AND ((A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+					)
+			</if>
+			<if test='kinds == "name" and searchTxt != null and searchTxt != ""'>
+				AND (A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "ceo" and searchTxt != null and searchTxt !=""'>
+				AND (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "sectors" and searchTxt != null and searchTxt !=""'>
+				AND (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='boardType != null and boardType !=""'>
+				AND A.BOARD_TYPE = #{boardType}
+			</if>
+			ORDER BY CREATE_DATE DESC, A.BOARD_NO DESC
+	</select>
+	
+	<select id="selectEcMemList" parameterType="egovframework.user.member.vo.MemberVO" resultType="hashMap">
+			SELECT
+			 A.BOARD_NO,
+			 A.BOARD_TYPE,
+			 A.CREATE_ID, 
+			 A.HOMEPAGE,
+			 A.SECTORS,
+			 A.COM_NM,
+			 IDX,
+			 ST_FILE_NM,
+			 REF_TYPE,
+			 TFM.REF_IDX,
+			 A.COM_REPRE_NM,
+			 A.EST_YEAR,
+			 A.COM_EMPL_CNT,
+			 A.COM_REPRE_NUM,
+			 A.FAX,
+			 A.USE_YN,
+			 A.DIVISION,
+			 A.CREATE_DATE AS ORG_CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS UPDATE_DATE
+		FROM 
+			MEMBER_BOARD A
+			RIGHT JOIN TB_FILE_MNG TFM
+			ON A.BOARD_NO = TFM.REF_IDX
+			, (SELECT @ROWNUM := 0) AS RN 
+		WHERE 1=1
+			AND DIVISION = "M3"
+			<if test='kinds == "all"'>
+				AND ((A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+					)
+			</if>
+			<if test='kinds == "name" and searchTxt != null and searchTxt != ""'>
+				AND (A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "ceo" and searchTxt != null and searchTxt !=""'>
+				AND (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "sectors" and searchTxt != null and searchTxt !=""'>
+				AND (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='boardType != null and boardType !=""'>
+				AND A.BOARD_TYPE = #{boardType}
+			</if>
+			ORDER BY CREATE_DATE DESC, A.BOARD_NO DESC
+	</select>
+	
+	<select id="selectScMemList" parameterType="egovframework.user.member.vo.MemberVO" resultType="hashMap">
+			SELECT
+			 A.BOARD_NO,
+			 A.BOARD_TYPE,
+			 A.CREATE_ID, 
+			 A.HOMEPAGE,
+			 A.SECTORS,
+			 A.COM_NM,
+			 IDX,
+			 ST_FILE_NM,
+			 REF_TYPE,
+			 TFM.REF_IDX,
+			 A.COM_REPRE_NM,
+			 A.EST_YEAR,
+			 A.COM_EMPL_CNT,
+			 A.COM_REPRE_NUM,
+			 A.FAX,
+			 A.USE_YN,
+			 A.DIVISION,
+			 A.CREATE_DATE AS ORG_CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE,
+			 DATE_FORMAT(STR_TO_DATE(A.UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS UPDATE_DATE
+		FROM 
+			MEMBER_BOARD A
+			RIGHT JOIN TB_FILE_MNG TFM
+			ON A.BOARD_NO = TFM.REF_IDX
+			, (SELECT @ROWNUM := 0) AS RN 
+		WHERE 1=1
+			AND DIVISION = "M4"
+			<if test='kinds == "all"'>
+				AND ((A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+					 OR (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+					)
+			</if>
+			<if test='kinds == "name" and searchTxt != null and searchTxt != ""'>
+				AND (A.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "ceo" and searchTxt != null and searchTxt !=""'>
+				AND (A.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='kinds == "sectors" and searchTxt != null and searchTxt !=""'>
+				AND (A.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+			</if>
+			<if test='boardType != null and boardType !=""'>
+				AND A.BOARD_TYPE = #{boardType}
+			</if>
+			ORDER BY CREATE_DATE DESC, A.BOARD_NO DESC
+	</select>
+	
+	<select id="memInfoContent" parameterType="egovframework.user.info.vo.InfoVO" resultType="map">
+			SELECT
+				A.BOARD_NO,
+				A.BOARD_TYPE,
+				A.CREATE_ID, 
+				A.HOMEPAGE,
+				A.SECTORS,
+			 	A.COM_NM,
+			 	A.COM_REPRE_NM,
+			 	A.EST_YEAR,
+			 	A.COM_EMPL_CNT,
+				A.COM_REPRE_NUM,
+			 	A.FAX,
+				A.USE_YN,
+			 	A.DIVISION,
+				 <![CDATA[
+				 replace(A.CONTENT, '\r\n',  '</br>' ) AS CONTENT,
+				 ]]>
+				 A.VIEW_CNT,
+				 A.USE_YN,
+				 A.LANGUAGE_TYPE,
+				 A.CREATE_DATE AS ORG_CREATE_DATE,
+				 DATE_FORMAT(STR_TO_DATE(A.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE,
+				 DATE_FORMAT(STR_TO_DATE(A.UPDATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS UPDATE_DATE,
+				 BF.CREATE_DATE AS ORG_BF_CREATE_DATE,
+				 NT.CREATE_DATE AS ORG_NT_CREATE_DATE,
+				 BF.BOARD_NO AS BF_BOARD_NO,
+    			 NT.BOARD_NO AS NT_BOARD_NO,
+    			 BF.BOARD_TYPE AS BF_BOARD_TYPE,
+    			 NT.BOARD_TYPE AS NT_BOARD_TYPE,
+    			 BF.COM_NM AS BF_COM_NM,
+    			 NT.COM_NM AS NT_COM_NM
+    			 
+			FROM 
+				MEMBER_BOARD A
+				<![CDATA[
+				LEFT OUTER JOIN(SELECT B.* 
+								FROM MEMBER_BOARD B 
+								WHERE B.CREATE_DATE < #{createDate} AND B.BOARD_TYPE = #{boardType} ]]> 
+									<if test='kinds == "all"'>
+									AND ((B.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+										)
+									</if>
+									<if test='kinds == "comNm" and searchTxt != null and searchTxt != ""'>
+										AND (B.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "comRepreNm" and searchTxt != null and searchTxt !=""'>
+										AND (B.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "sectors" and searchTxt != null and searchTxt !=""'>
+										AND (B.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='division != null and division !=""'>
+									AND B.DIVISION = #{division}
+									</if>
+								ORDER BY B.CREATE_DATE DESC, B.BOARD_NO DESC LIMIT 1
+								) BF
+							ON A.BOARD_TYPE = BF.BOARD_TYPE
+				<![CDATA[			
+				LEFT OUTER JOIN (SELECT B.* 
+								FROM MEMBER_BOARD B 
+								WHERE B.CREATE_DATE > #{createDate} AND B.BOARD_TYPE = #{boardType}  ]]>
+									<if test='kinds == "all"'>
+									AND ((B.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+										 OR (B.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+										)
+									</if>
+									<if test='kinds == "comNm" and searchTxt != null and searchTxt != ""'>
+										AND (B.COM_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "comRepreNm" and searchTxt != null and searchTxt !=""'>
+										AND (B.COM_REPRE_NM LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='kinds == "sectors" and searchTxt != null and searchTxt !=""'>
+										AND (B.SECTORS LIKE CONCAT("%", #{searchTxt}, "%"))
+									</if>
+									<if test='division != null and division !=""'>
+									AND B.DIVISION = #{division}
+									</if>
+								ORDER BY B.CREATE_DATE, B.BOARD_NO LIMIT 1	
+								) NT 	
+							ON A.BOARD_TYPE = NT.BOARD_TYPE
+				
+			WHERE 1=1
+				<if test='boardNo != null and boardNo !=""'>
+				AND A.BOARD_NO = #{boardNo}
+				</if>
+				<if test='boardType != null and boardType !=""'>
+				AND A.BOARD_TYPE = #{boardType}
+				</if>
+				<if test='division != null and division !=""'>
+				AND A.DIVISION = #{division}
+				</if>
+				
+				
+	</select>
+</mapper>

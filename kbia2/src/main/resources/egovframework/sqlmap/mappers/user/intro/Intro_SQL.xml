@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.user.intro.dao.IntroMapper">
+
+
+	<select id="selectOrganTop" parameterType="egovframework.user.intro.vo.IntroVO" resultType="hashMap">
+		SELECT A.TEXT1
+			,A.TEXT1_POSITION 
+			,A.TEXT2 
+			,A.TEXT2_POSITION 
+			,B.CODE_NO 
+			,B.CODE_DTL 
+			,B.CODE_NM 
+			,B.EXT1
+		FROM ORGANIZATION_TOP A
+		,(SELECT B.CODE_NO, B.CODE_DTL, B.CODE_NM, B.EXT1, B.EXT2
+			FROM COM_CODE B
+		   WHERE CODE_NO = 'ORGAN') B
+		ORDER BY B.EXT2
+	</select>
+	
+	<select id="selectOrganBottom" parameterType="egovframework.user.intro.vo.IntroVO" resultType="hashMap">
+		SELECT GROUP_CODE
+				, (SELECT CODE_NM FROM COM_CODE B WHERE CODE_NO='ORGAN' AND B.CODE_DTL=A.GROUP_CODE) GROUP_NM
+				, NAME
+				, POSITION_NM
+				, TASK
+				, TEL
+				, EMAIL
+				, SEQ
+		FROM ORGANIZATION_BOTTOM A
+		ORDER BY SEQ
+	</select>
+	
+	<select id="getFntExcuList" parameterType="egovframework.user.intro.vo.IntroVO" resultType="hashMap">
+	SELECT 
+		@ROWNUM := @ROWNUM +1 AS row_num,
+		A.*
+	FROM (
+		SELECT
+			 cb.BOARD_NO,
+			 cb.BOARD_TYPE,
+			 (SELECT C.CODE_NM FROM kbia.COM_CODE C WHERE LANGUAGE_TYPE = C.CODE_DTL AND C.CODE_NO='COMM') AS LANGUAGE_TYPE,
+			 cc.CODE_NM AS EXCU_TYPE,
+			 cb.EXCU_TYPE AS EXCU_TYPE_CODE,
+			 cb.EXCU_NAME,
+			 cb.EXCU_POSITION,
+			 cb.EXCU_COMPANY,
+			 cb.LOCATION_N,
+			 cb.USE_YN,
+			 DATE_FORMAT(STR_TO_DATE(cb.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE, 			 
+			 cb.CREATE_ID,
+			 cb.LANGUAGE_TYPE AS LANGUAGE_TYPE_CODE,
+			 tfm.FILE_PATH, 
+			 tfm.ST_FILE_NM 
+		FROM 
+			kbia.CONTENT_BOARD cb,
+			kbia.COM_CODE cc,
+			kbia.TB_FILE_MNG tfm 
+		WHERE 1=1
+			AND cb.EXCU_TYPE = cc.CODE_DTL
+			AND cb.BOARD_TYPE = 'EXCU'
+			AND cb.BOARD_NO = tfm.REF_IDX
+			AND cc.CODE_NO = 'EXCU'
+			AND cb.LANGUAGE_TYPE = #{languageType}
+		ORDER BY
+			cb.LOCATION_N ASC
+		) AS A,
+		(SELECT @ROWNUM := 0) AS RN
+	WHERE 1=1
+		AND use_yn = #{useYn}
+	</select>
+	
+	<select id="getFntExcuType" parameterType="egovframework.user.intro.vo.IntroVO" resultType="hashMap">
+		SELECT 
+			CODE_NO,
+			CODE_DTL,
+			CODE_NM
+		FROM 
+			COM_CODE
+		where 1=1
+			AND CODE_NO = 'EXCU'
+	</select>
+</mapper>

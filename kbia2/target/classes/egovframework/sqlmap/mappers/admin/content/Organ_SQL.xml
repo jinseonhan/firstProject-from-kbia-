@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="egovframework.admin.content.dao.OrganMapper">
+	<select id="getOrganList" parameterType="egovMap" resultType="egovMap">
+		SELECT
+			@ROWNUM := @ROWNUM + 1 AS ROW_NUM
+			, cb.BOARD_NO 
+			, cb.BOARD_TYPE 
+			, DATE_FORMAT(STR_TO_DATE(cb.CREATE_DATE, '%Y%m%d'), '%Y.%m.%d') CREATE_DATE
+			, cb.UPDATE_DATE 
+			, cb.USE_YN 
+			, cb.LANGUAGE_TYPE 
+			, cb.LOCATION_N 
+			, cb.ORGAN_GROUP_CODE 
+			, cc.CODE_NM 
+			, cb.ORGAN_NAME 
+			, cb.ORGAN_POSITION_NAME 
+			, cb.ORGAN_TASK 
+			, cb.ORGAN_PHONE_NUM 
+			, cb.ORGAN_EMAIL 
+		FROM 
+			(SELECT @ROWNUM := 0) AS RN
+			, kbia.CONTENT_BOARD cb
+			LEFT OUTER JOIN kbia.COM_CODE cc
+			ON 1=1
+				AND cb.ORGAN_GROUP_CODE = cc.CODE_DTL 
+				AND cb.ORGAN_GROUP_CODE = cc.CODE_DTL 
+		WHERE 1=1
+			AND cb.BOARD_TYPE = 'ORGAN'
+			<if test="stDate != null and stDate != ''">
+			<![CDATA[ AND STR_TO_DATE(cb.CREATE_DATE, '%Y%m%d') >= #{stDate} ]]>
+			</if>
+			<if test="enDate != null and enDate != ''">
+			<![CDATA[ AND STR_TO_DATE(cb.CREATE_DATE, '%Y%m%d') <= #{enDate} ]]>
+			</if>
+			<if test="name != null and name != ''">
+			AND ORGAN_NAME like CONCAT('%', #{name}, '%')
+			</if>
+			<if test="useYn != null and useYn != '' and useYn != 'all'">
+			AND cb.USE_YN = #{useYn}
+			</if>
+			<if test="lang != null and lang != '' and lang != 'all'">
+			AND cb.LANGUAGE_TYPE = #{lang}
+			</if>
+			<if test="groupCode != null and groupCode != ''">
+			AND cb.ORGAN_GROUP_CODE = #{groupCode}
+			</if>
+		ORDER BY 
+			cb.USE_YN desc
+			, cb.ORGAN_GROUP_CODE asc
+			, cb.LOCATION_N asc
+	</select>
+	
+	<!-- 부서 조회 -->
+	<select id="getGroupList" parameterType="egovMap" resultType="egovMap">
+		SELECT 
+			CODE_DTL 
+			, CODE_NM 
+			, EXT1 
+		FROM 
+			kbia.COM_CODE 
+		WHERE 1=1
+			AND CODE_NO = 'ORGAN'
+	</select>
+	
+	<!-- 조직도 등록 -->
+	<insert id="organReg" parameterType="egovMap">
+		INSERT INTO 
+			kbia.CONTENT_BOARD(
+				BOARD_NO 
+				, BOARD_TYPE 
+				, CREATE_ID
+				, CREATE_DATE 
+				, UPDATE_DATE 
+				<if test="useYn != null and useYn != ''">
+				, USE_YN 
+				</if>
+				, LANGUAGE_TYPE 
+				<if test="locationNo != null and locationNo != ''">
+				, LOCATION_N 
+				</if>
+				, ORGAN_GROUP_CODE 
+				, ORGAN_NAME 
+				, ORGAN_POSITION_NAME 
+				, ORGAN_TASK 
+				<if test="phone != null and phone != ''">
+				, ORGAN_PHONE_NUM 
+				</if>
+				<if test="email != null and email != ''">
+				, ORGAN_EMAIL 
+				</if>
+			)
+			VALUES(
+				#{seq}
+				, 'ORGAN'
+				, #{createId}
+				, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+				, DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+				<if test="useYn != null and useYn != ''">
+				, #{useYn}
+				</if>
+				, #{lang}
+				<if test="locationNo != null and locationNo != ''">
+				, #{locationNo}
+				</if>
+				, #{groupCode}
+				, #{name}
+				, #{position}
+				, #{task}
+				<if test="phone != null and phone != ''">
+				, #{phone}
+				</if>
+				<if test="email != null and email != ''">
+				, #{email}
+				</if>
+			)
+	</insert>
+	
+	<!-- 노출순서 중복 체크 -->
+	<select id="chkLocationN" parameterType="egovMap" resultType="boolean">
+		SELECT
+			COUNT(*)
+		FROM kbia.CONTENT_BOARD
+		WHERE 1=1
+			AND USE_YN = 'Y'
+			AND ORGAN_GROUP_CODE = #{groupCode}
+			AND LOCATION_N = #{locationN}
+	</select>
+	
+	<!-- 부회장 / 부이사장, 상무 / 사무국장 중복 체크 -->
+	<select id="chkHigher" parameterType="egovMap" resultType="boolean">
+		SELECT
+			COUNT(*)
+		FROM kbia.CONTENT_BOARD
+		WHERE 1=1
+			AND USE_YN = 'Y'
+			AND ORGAN_GROUP_CODE = #{groupCode}
+	</select>
+	
+	<!-- 조직도 상세 조회 -->
+	<select id="getOrgan" parameterType="egovMap" resultType="egovMap">
+		SELECT
+			cb.BOARD_NO 
+			, cb.BOARD_TYPE 
+			, cb.CREATE_ID
+			, cb.CREATE_DATE 
+			, cb.UPDATE_DATE 
+			, cb.USE_YN 
+			, cb.LANGUAGE_TYPE 
+			, cb.LOCATION_N 
+			, cb.ORGAN_GROUP_CODE 
+			, cc.CODE_NM 
+			, cb.ORGAN_NAME 
+			, cb.ORGAN_POSITION_NAME 
+			, cb.ORGAN_TASK 
+			, cb.ORGAN_PHONE_NUM 
+			, cb.ORGAN_EMAIL 
+		FROM 
+			kbia.CONTENT_BOARD cb
+			LEFT OUTER JOIN kbia.COM_CODE cc
+			ON 1=1
+				AND cb.ORGAN_GROUP_CODE = cc.CODE_DTL 
+				AND cb.ORGAN_GROUP_CODE = cc.CODE_DTL 
+		WHERE 1=1
+			AND cb.BOARD_TYPE = 'ORGAN'
+			AND ( cb.BOARD_NO = #{boardNo} AND cb.BOARD_TYPE = #{boardType})
+	</select>
+	
+	<!-- 조직도 수정 -->
+	<update id="organModify" parameterType="egovMap">
+		UPDATE kbia.CONTENT_BOARD 
+		SET
+			ORGAN_GROUP_CODE = #{groupCode}
+			, ORGAN_NAME = #{name}
+			, ORGAN_POSITION_NAME = #{position}
+			, ORGAN_TASK = #{task}
+			, LOCATION_N = #{locationN}
+			<if test="useYn != null and useYn != ''">
+			, USE_YN = #{useYn}
+			</if>
+			<if test="lang != null and lang != ''">
+			, LANGUAGE_TYPE = #{lang}
+			</if>
+			<if test="phone != null and phone != ''">
+			, ORGAN_PHONE_NUM = #{phone}
+			</if>
+			<if test="email != null and email != ''">
+			, ORGAN_EMAIL = #{email}
+			</if>
+			, UPDATE_DATE = DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+		WHERE 1=1
+			AND BOARD_NO = #{boardNo}
+			AND BOARD_TYPE = #{boardType} 
+	</update>
+	
+	<!-- 조직도 삭제 -->
+	<delete id="organDelete" parameterType="egovMap">
+		DELETE FROM CONTENT_BOARD 
+		WHERE BOARD_NO = #{boardNo} AND BOARD_TYPE = #{boardType}
+	</delete>
+</mapper>

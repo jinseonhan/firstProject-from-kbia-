@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.content.dao.ContentMapper">
+	<!-- <select id="selectUserCnt" parameterType="egovframework.admin.account.vo.AccountVO" resultType="int">
+			SELECT COUNT(USER_ID) CNT
+			FROM G_USER
+			WHERE 1=1
+			<if test='userIdNm != null and userIdNm != ""'> 
+				AND ( USER_ID LIKE CONCAT("%", #{userIdNm} , "%") OR USER_NM LIKE CONCAT("%", #{userIdNm} , "%") )
+			</if>	
+	</select>
+	 -->
+	<select id="selectContentList" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+			SELECT
+				 @ROWNUM := @ROWNUM + 1 AS ROW_NUM,
+				 LANGUAGE_TYPE,
+				 TITLE, 
+				 EXT1 ,
+				 USE_YN,
+				 CREATE_ID,
+				 DATE_FORMAT(STR_TO_DATE(CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE		
+			
+			FROM 
+				CONTENT_BOARD,
+				(SELECT @ROWNUM := 0) AS RN
+			WHERE 1=1
+			<!-- 시작일 과 종료일로 검색 -->
+			<if test='regStartDate != null and regStartDate != "" and regEndDate != null and regEndDate != ""'>
+            AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{regStartDate}, '-', '') AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{regEndDate}, '-', '')
+         	</if>
+         	<!-- 시작일로 검색 -->
+         	<if test='regStartDate != null and regStartDate != "" '>
+         	AND CREATE_DATE <![CDATA[>=]]> REPLACE(#{regStartDate}, '-', '')  
+         	</if>
+         	<!-- 종료일로 검색 -->
+         	<if test='regEndDate != null and regEndDate != "" '>
+         	AND CREATE_DATE <![CDATA[<=]]> REPLACE(#{regEndDate}, '-', '')  
+         	</if>
+			<!-- 사용 여부 검색-->
+			<if test='useYn != null and useYn != ""'>
+			AND (USE_YN LIKE CONCAT("%", #{useYn}, "%"))
+			</if>
+			<!-- 언어 타입 검색 -->
+			<if test='languageType != null and languageType != ""' >
+			AND (LANGUAGE_TYPE LIKE CONCAT("%", #{languageType}, "%"))
+			</if>
+			<!-- 제목 검색 -->		
+			<if test='title != null and title != ""'>
+			AND (TITLE LIKE CONCAT("%", #{title}, "%"))
+			</if>
+			ORDER BY ROW_NUM DESC
+	</select>
+</mapper>

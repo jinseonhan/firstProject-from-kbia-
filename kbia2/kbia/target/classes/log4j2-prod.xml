@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %5p [%c] %m%n" />
+        </Console>
+		
+		<!-- attribute: name(Appender명), fileName(target파일명), filePattern(history파일명), append, immediateFlush, ignoreExceptions, bufferedIO -->
+		<!-- element: Layout(출력패턴설정), Filters, Policy(file rolling 조건 설정), Strategy(file name과 location 관련 설정) -->
+		<RollingFile name="rollingFile" fileName="/sorc/file/logs/kbia/system_log.log" filePattern="/sorc/file/logs/kbia/system_log_%d{yyyyMMdd}.log">
+			<PatternLayout pattern="%d %5p [%c] %m%n" />
+			<Policies>			 			
+				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+			</Policies>			
+		</RollingFile>
+    </Appenders>
+    
+    <Loggers>
+        <Logger name="java.sql" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="egovframework" level="DEBUG" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile" />
+        </Logger>
+        
+        <!-- log SQL with timing information, post execution -->
+        <Logger name="jdbc.sqltiming" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.springframework" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Root level="DEBUG">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile" />
+        </Root>
+    </Loggers>
+</Configuration>

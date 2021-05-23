@@ -1,0 +1,202 @@
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+
+<script src="/resouces/js/admin/jquery-3.4.1.min.js"></script>
+<script src="/resouces/js/admin/notice/noticeEventContent.js?20210120_1"></script>
+<!-- header -->
+<jsp:include page="../header.jsp" flush="false"></jsp:include>
+<!--// header -->
+<input type="hidden" id="lnbset1" value="notice"> <!-- 중분류 -->
+<input type="hidden" id="lnbset2" value="Event"> <!-- 해당 jsp명 -->
+<!-- 스마트 에디터를 적용하기 위한 스크립트 -->
+<script src="/resouces/static/js/service/HuskyEZCreator.js"></script>
+
+
+<input type="hidden" id="boardNo" value="${params.boardNo}" />
+<input type="hidden" id="boardType" value="${params.boardType}" />
+	<!-- container -->
+	<div id="container">
+		<!-- lnb -->
+		<jsp:include page="../lnb.jsp" flush="false"></jsp:include>
+		<!--// lnb -->
+		<!-- contents -->
+		
+	<div class="contents">
+			<h2>행사정보</h2>
+
+			<!-- rowTable -->
+			<div class="rowTable">
+				<table>
+					<caption>제목, 내용, 행사기간, 언어, 사용여부 항목으로 구성된 입력 테이블입니다.</caption>
+					<colgroup>
+						<col style="width:150px">
+						<col style="width:auto">
+					</colgroup>
+					<tbody>
+						<tr>
+							<th scope="row">제목 <span class="cRed">*</span></th>
+							<td><input type="text" id="title" title="제목 입력" class="w412"></td>
+						</tr>
+						<tr>
+							<th scope="row">내용</th>
+							<td>
+								<textarea id="text"title="내용 입력"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">행사기간</th>
+							<td>
+								<span class="date"><input type="text" id="stdate" title="등록일선택"></span>
+								<div class="selectbox w100">
+									<span id="EventSt">선택</span>
+										<select title="시 선택" id="EventStHour">
+											<option value="">시</option>
+											<option value="00">00</option>
+											<option value="01">01</option>
+											<option value="02">02</option>
+											<option value="03">03</option>
+											<option value="04">04</option>
+											<option value="05">05</option>
+											<option value="06">06</option>
+											<option value="07">07</option>
+											<option value="08">08</option>
+											<option value="09">09</option>
+											<option value="10">10</option>
+											<option value="11">11</option>
+											<option value="12">12</option>
+											<option value="13">13</option>
+											<option value="14">14</option>
+											<option value="15">15</option>
+											<option value="16">16</option>
+											<option value="17">17</option>
+											<option value="18">18</option>
+											<option value="19">19</option>
+											<option value="20">20</option>
+											<option value="21">21</option>
+											<option value="22">22</option>
+											<option value="23">23</option>
+										</select>
+								</div>
+								<div class="selectbox w100">
+									<span id="EventSm">선택</span>
+										<select title="분 선택" id="EventStMinute">
+											<option value="">분</option>
+											<option value="00">00</option>
+											<option value="05">05</option>
+											<option value="10">10</option>
+											<option value="15">15</option>
+											<option value="20">20</option>
+											<option value="25">25</option>
+											<option value="30">30</option>
+											<option value="35">35</option>
+											<option value="40">40</option>
+											<option value="45">45</option>
+											<option value="50">50</option>
+											<option value="55">55</option>
+										</select>
+								</div>
+								<span class="date"><input type="text" id="endate" title="등록일선택"></span>
+								<div class="selectbox w100">
+									<span id="EventEs">선택</span>
+										<select title="시 선택" id="EventEndSHour">
+											<option value="">시</option>
+											<option value="00">00</option>
+											<option value="01">01</option>
+											<option value="02">02</option>
+											<option value="03">03</option>
+											<option value="04">04</option>
+											<option value="05">05</option>
+											<option value="06">06</option>
+											<option value="07">07</option>
+											<option value="08">08</option>
+											<option value="09">09</option>
+											<option value="10">10</option>
+											<option value="11">11</option>
+											<option value="12">12</option>
+											<option value="13">13</option>
+											<option value="14">14</option>
+											<option value="15">15</option>
+											<option value="16">16</option>
+											<option value="17">17</option>
+											<option value="18">18</option>
+											<option value="19">19</option>
+											<option value="20">20</option>
+											<option value="21">21</option>
+											<option value="22">22</option>
+											<option value="23">23</option>
+										</select>
+								</div>
+								<div class="selectbox w100">
+									<span id="EventEm">선택</span>
+										<select title="분 선택" id="EventEndEMinute">
+											<option value="">분</option>
+											<option value="00">00</option>
+											<option value="05">05</option>
+											<option value="10">10</option>
+											<option value="15">15</option>
+											<option value="20">20</option>
+											<option value="25">25</option>
+											<option value="30">30</option>
+											<option value="35">35</option>
+											<option value="40">40</option>
+											<option value="45">45</option>
+											<option value="50">50</option>
+											<option value="55">55</option>
+										</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">언어</th>
+							<td>
+								<div class="checkboxWrap">
+									<span class="checkbox">
+										<input type="radio" id="chk0301" name="chk03" value="KOR" checked>
+										<label for="chk0201">국문</label>
+									</span>
+									<span class="checkbox">
+										<input type="radio" id="chk0302" name="chk03" value="ENG">
+										<label for="chk0202">영문</label>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">사용여부</th>
+							<td>
+								<div class="checkboxWrap">
+									<span class="checkbox">
+										<input type="radio" id="chk0401" name="chk04" value = "Y" checked>
+										<label for="chk0201">사용</label>
+									</span>
+									<span class="checkbox">
+										<input type="radio" id="chk0402" name="chk04" value = "N">
+										<label for="chk0202">미사용</label>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">등록정보</th>
+							<td id ="regist">등록자 ID / 최종수정일</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<!--// rowTable -->
+			<!-- btnBottom -->
+			<div class="btnBottom">
+				<div class="right">
+					<button type="button" class="btn btnPointL" id="deleteBtn">삭제</button>
+					<button type="button" class="btn btnPointL" id=cancelBtn>취소</button>
+					<button type="button" class="btn btnPoint" id="registBtn">저장</button>
+				</div>
+			</div>
+			<!--// btnBottom -->
+		</div>
+		<!--// contents -->
+	</div>
+	<!--// container -->
+</div>
+<!--// wrap -->
+</body>
+</html>

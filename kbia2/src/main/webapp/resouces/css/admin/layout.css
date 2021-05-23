@@ -1,0 +1,54 @@
+﻿@charset "utf-8";
+#wrap {overflow:hidden}
+#header {border-bottom:1px solid #ddd}
+#header .inner {position:relative; /* margin:0 auto; */ padding:0 20px; max-width:100%; width:1400px}
+#header .inner h1 {padding:18px 0 17px}
+#header .inner h1 a {display:block; width:419px; height:40px; text-indent:-9999px; background:url("/resouces/images/admin/common/logo.png") no-repeat left center}
+#header .inner .util {overflow:hidden; position:absolute; top:26px; right:20px}
+#header .inner .util > * {float:left}
+#header .inner .util > * + * {margin-left:10px}
+#header .inner .util button {display:inline-block; padding:0 25px; border:1px solid #ccc; border-radius:13px; line-height:23px; background:#fff}
+#header .inner .util strong {line-height:25px; font-size:14px; color:#000}
+
+#gnb {position:relative; background:#0055a5}
+#gnb .btnMenuClose {display:none}
+#gnb > ul {margin:0 auto; max-width:100%; width:1300px}
+#gnb > ul:after {display:block; content:""; clear:both}
+#gnb > ul > li {float:left; width:20%; text-align:center}
+#gnb > ul > li > a {display:block; position:relative; line-height:50px; font-size:16px; color:#fff; font-weight:500; -webkit-transition:all 0.2s; transition:all 0.2s}
+#gnb > ul > li:hover > a {color:#f8cd56}
+#gnb > ul > li + li > a:before {display:block; content:""; position:absolute; top:17px; left:0; width:1px; height:16px; background:#6d7da1}
+#gnb > ul > li div {display:none; position:absolute; top:50px; left:0; border-bottom:1px solid #ccc; width:100%; background:#f5f5f5}
+#gnb > ul > li div ul {margin:0 auto; max-width:100%; width:1300px; text-align:right}
+#gnb > ul > li ul li {display:inline-block; position:relative; padding:10px 30px}
+#gnb > ul > li ul li + li {margin-left:-2px}
+#gnb > ul > li ul li + li:before {display:block; content:""; position:absolute; top:21px; left:0; width:1px; height:10px; background:#ccc}
+#gnb > ul > li ul li a {display:block; line-height:30px; font-size:16px; -webkit-transition:all 0.2s; transition:all 0.2s}
+#gnb > ul > li ul li a:hover {font-weight:500; color:#0055a5}
+#gnb > ul > li.curr > a {color:#f8cd56}
+#gnb > ul > li.curr div {display:block !important}
+#gnb > ul > li ul li.curr a {font-weight:500; color:#0055a5}
+#container {display:flex; width:1440px}
+#container .lnb {overflow-y:auto; width:220px; border-right:1px solid #ddd; height:calc(100vh - 76px)}
+#container .lnb > ul > li {border-bottom:1px solid #ddd}
+#container .lnb > ul > li > a {display:block; padding:0 20px; line-height:50px; font-size:15px; color:#000; font-weight:500}
+#container .lnb > ul > li > ul {padding:0 20px 0 30px; border-top:1px solid #ddd}
+#container .lnb > ul > li > ul li:first-child {padding-top:10px}
+#container .lnb > ul > li > ul li:last-child {padding-bottom:10px}
+#container .lnb > ul > li > ul li a {display:block; position:relative; padding-left:8px; line-height:30px; font-size:14px; color:#666}
+#container .lnb > ul > li > ul li a:before {display:block; content:""; position:absolute; top:14px; left:0; border-radius:50%; width:2px; height:2px; background:#666}
+#container .lnb > ul > li.more > a {background:url("/resouces/images/admin/common/bl-arrow.png") no-repeat right 20px center/12px}
+#container .lnb > ul > li:hover > a {color:#000; background:#f8f8f8}
+#container .lnb > ul > li.more:hover > a {background:#f8f8f8 url("/resouces/images/admin/common/bl-arrow.png") no-repeat right 20px center/12px}
+#container .lnb > ul > li.on > a,
+#container .lnb > ul > li.curr > a {color:#fff; background:#0055a5}
+#container .lnb > ul > li.more.on > a,
+#container .lnb > ul > li.more.curr > a {background:#0055a5 url("/resouces/images/admin/common/bl-arrow-on.png") no-repeat right 20px center/12px}
+#container .lnb > ul > li > ul {display:none}
+#container .lnb > ul > li > ul li.curr > a,
+#container .lnb > ul > li > ul li a:hover {color:#0055a5}
+#container .lnb > ul > li > ul li.curr > a:before,
+#container .lnb > ul > li > ul li a:hover:before {background:#0055a5}
+#container .contents {flex:1; margin:0 auto; margin-left:50px; padding:20px 20px 100px 0}
+#container .contents h2 {position:relative; margin-bottom:10px; line-height:40px; font-size:30px; font-weight:500; color:#000}
+#container .contents h2 p {position:absolute; top:10px; right:0} /* 2020-12-11 */

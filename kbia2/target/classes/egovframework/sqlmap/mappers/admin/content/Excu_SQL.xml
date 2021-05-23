@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.admin.content.dao.ExcuMapper">
+
+<select id="selectExcuList" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+	SELECT 
+		@ROWNUM := @ROWNUM +1 AS row_num,
+		A.*
+	FROM (
+		SELECT
+			 cb.BOARD_NO,
+			 cb.BOARD_TYPE,
+			 cb.EXCU_TYPE,
+			 cc.CODE_NM AS EXCU_TYPE_NAME,
+			 cb.EXCU_NAME,
+			 cb.EXCU_POSITION,
+			 cb.EXCU_COMPANY,
+			 cb.LOCATION_N,
+			 cb.USE_YN,
+			 DATE_FORMAT(STR_TO_DATE(cb.CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE, 			 
+			 cb.CREATE_ID,
+			 cb.LANGUAGE_TYPE AS LANGUAGE_TYPE_CODE,
+			 CASE
+			 	WHEN cb.LANGUAGE_TYPE = 'KOR' THEN '국문'
+			 	WHEN cb.LANGUAGE_TYPE = 'ENG' THEN '영문'
+			 END LANGUAGE_TYPE
+		FROM 
+			CONTENT_BOARD cb,
+			COM_CODE cc 
+		WHERE 1=1
+			AND cb.BOARD_TYPE = 'EXCU'
+			AND cc.CODE_DTL = cb.EXCU_TYPE
+			AND cc.CODE_NO = 'EXCU'
+		) AS A,
+		(SELECT @ROWNUM := 0) AS RN
+	WHERE 1=1 
+	<if test='boardType != "" and boardType != null'>
+		AND BOARD_TYPE = #{boardType}
+	</if>
+	
+	<if test='excu_name != "" and excu_name != null'>
+		AND EXCU_NAME LIKE CONCAT("%",#{excu_name},"%")
+	</if>
+	
+	<if test='useYn != "" and useYn != null'>
+		AND USE_YN = #{useYn}
+	</if>
+	
+	<if test='languageType != "" and languageType != null'>
+		AND LANGUAGE_TYPE_CODE = #{languageType}
+	</if>
+	<if test='stDate != "" and stDate != null and enDate != "" and enDate != null'>
+		AND CREATE_DATE BETWEEN DATE_FORMAT(#{stDate}, '%Y.%m.%d') AND DATE_FORMAT(#{enDate}, '%Y.%m.%d')
+	</if>
+	
+   	ORDER BY
+			EXCU_TYPE ASC, LOCATION_N ASC
+
+</select>
+
+<insert id="excuReg" parameterType="egovframework.admin.content.vo.ContentVO">
+	INSERT INTO CONTENT_BOARD(
+		BOARD_NO
+		, BOARD_TYPE
+		, CREATE_ID
+		, EXCU_TYPE
+		, EXCU_NAME
+		, EXCU_POSITION
+		, EXCU_COMPANY
+		, LOCATION_N
+		, LANGUAGE_TYPE
+		, USE_YN
+		, CREATE_DATE
+	)VALUES(
+		#{boardNo}
+		,#{boardType}
+		,#{createId}
+		,#{excu_type}
+		,#{excu_name}
+		,#{excu_position}
+		,#{excu_company}
+		,#{location_n}
+		,#{language}
+		,#{use_yn}
+		,DATE_FORMAT(now(), '%Y%m%d%H%i%s')
+	)
+</insert>
+
+<select id="excuNumChk" parameterType="egovframework.admin.content.vo.ContentVO" resultType="int">
+	SELECT 
+		COUNT(LOCATION_N) 
+	FROM 
+		kbia.CONTENT_BOARD 
+	WHERE 1=1 
+		AND BOARD_TYPE = 'EXCU' 
+		AND LOCATION_N = #{location_n}
+		AND USE_YN = 'Y'
+		AND EXCU_TYPE = #{excu_type}
+</select>
+
+<select id="getExcu" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+	SELECT
+		 BOARD_NO,
+		 BOARD_TYPE,
+		 EXCU_TYPE,
+		 EXCU_NAME,
+		 EXCU_POSITION,
+		 EXCU_COMPANY,
+		 LOCATION_N,
+		 USE_YN,
+		 DATE_FORMAT(STR_TO_DATE(CREATE_DATE, '%Y%m%d%H%i%S'), '%Y.%m.%d') AS CREATE_DATE, 			 
+		 CREATE_ID,
+		 LANGUAGE_TYPE
+	FROM 
+		kbia.CONTENT_BOARD
+	WHERE 1=1
+		AND BOARD_NO = #{boardNo}
+		AND BOARD_TYPE = #{boardType}
+</select>
+
+<update id="excuModify"  parameterType="egovframework.admin.content.vo.ContentVO">
+	UPDATE 
+		CONTENT_BOARD
+	SET
+		EXCU_TYPE = #{excu_type}
+		, EXCU_NAME = #{excu_name}
+		, EXCU_POSITION = #{excu_position}
+		, EXCU_COMPANY = #{excu_company}
+		, LOCATION_N = #{location_n}
+		, LANGUAGE_TYPE = #{language}
+		, USE_YN = #{use_yn}
+	WHERE 1=1
+		AND	BOARD_NO = #{boardNo}
+		AND BOARD_TYPE = #{boardType}	
+</update>
+
+<delete id="excuDel" parameterType="egovframework.admin.content.vo.ContentVO">
+	DELETE FROM
+		CONTENT_BOARD
+	WHERE 1=1
+		AND BOARD_NO = #{boardNo}
+		AND BOARD_TYPE = #{boardType}	
+</delete>
+
+<select id="getExcuType" parameterType="egovframework.admin.content.vo.ContentVO" resultType="hashMap">
+	SELECT 
+		CODE_NO,
+		CODE_DTL,
+		CODE_NM
+	FROM 
+		COM_CODE
+	where 1=1
+		AND CODE_NO = 'EXCU'
+</select>
+
+</mapper>

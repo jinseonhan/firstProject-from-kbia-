@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.user.main.dao.MainUserMapper">
+
+	<select id="selectLogCnt" parameterType="egovframework.user.main.vo.MainUserVO" resultType="int">
+			SELECT COUNT(*) CNT
+			  FROM LOG_ACCESS 
+			 WHERE IP = #{ip}
+			   AND YMD = #{ymd}
+			   AND LOG_ZSGR = #{logZsgr}
+	</select>
+	
+	<!-- 등록 -->
+	<insert id="insertLog" parameterType="egovframework.user.main.vo.MainUserVO">
+	INSERT INTO LOG_ACCESS
+		(IP, 
+		LOG_ZSGR, 
+		LOG_NUM, 
+		REG_DM, 
+		LOG_YEAR,
+		LOG_MONTH, 
+		LOG_DAY, 
+		YMD
+		)
+		VALUES
+		(#{ip}, 
+		#{logZsgr}, 
+		1, 
+		DATE_FORMAT(now(), '%Y%m%d%H%i%s'), 
+		#{logYear}, 
+		#{logMonth}, 
+		#{logDay}, 
+		#{ymd}
+		)
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="updateLog" parameterType="egovframework.user.main.vo.MainUserVO">
+	UPDATE LOG_ACCESS A, LOG_ACCESS B SET 	
+		A.LOG_NUM=B.LOG_NUM+1, 
+		A.LOG_YEAR=#{logYear}, 
+		A.LOG_MONTH=#{logMonth}, 
+		A.LOG_DAY=#{logDay}
+	WHERE A.IP=#{ip} AND A.IP=B.IP 
+	  AND A.LOG_ZSGR=#{logZsgr} AND A.LOG_ZSGR=B.LOG_ZSGR
+	  AND A.YMD=#{ymd} AND A.YMD=B.YMD
+	</update>
+	
+	<select id="selectAllStatslist" parameterType="egovframework.user.main.vo.MainUserVO" resultType="hashMap">
+			SELECT IP
+				   ,LOG_ZSGR
+				   ,LOG_NUM
+				   ,REG_DM
+				   ,LOG_YEAR
+				   ,LOG_MONTH
+				   ,LOG_DAY
+				   ,YMD
+			 FROM LOG_ACCESS 
+			 WHERE 1=1
+			<!-- 날짜 사이 검색 -->   	
+         	<if test='startDate != null and startDate != "" '>
+         		AND YMD <![CDATA[>=]]> REPLACE(#{startDate}, '-', '')  
+         	</if>         	
+         	<if test='endDate != null and endDate != "" '>
+         		AND YMD <![CDATA[<=]]> REPLACE(#{endDate}, '-', '')  
+         	</if>
+         	ORDER BY YMD DESC
+	</select>
+	
+	<select id="selectMonthStatslist" parameterType="egovframework.user.main.vo.MainUserVO" resultType="hashMap">
+			SELECT CONCAT(LOG_YEAR,'.',LOG_MONTH) LOG_MONTH
+					,COUNT(LOG_MONTH) MONTH_CNT
+					,(SELECT COUNT(*) FROM LOG_ACCESS WHERE LOG_YEAR = #{year}) YEAR_CNT
+					, TRUNCATE(( COUNT(LOG_MONTH)/(SELECT COUNT(*) FROM LOG_ACCESS WHERE LOG_YEAR = #{year}) * 100) , 0 ) AS PERCENTAGE
+	,CAST(CONCAT(COUNT(LOG_MONTH),' / ',TRUNCATE(( COUNT(LOG_MONTH)/(SELECT COUNT(*) FROM LOG_ACCESS WHERE LOG_YEAR = #{year}) * 100) , 0 ),'%') AS CHAR) MONTH_STATS
+			 FROM LOG_ACCESS 
+			 WHERE 1=1
+				AND LOG_YEAR = #{year}
+			 GROUP BY LOG_MONTH
+
+	</select>
+	
+	<select id="selectDayStatslist" parameterType="egovframework.user.main.vo.MainUserVO" resultType="hashMap">
+		SELECT CONCAT(LOG_DAY,'일') LOG_DAY
+				,COUNT(LOG_DAY) DAY_CNT
+				,(SELECT COUNT(*) FROM LOG_ACCESS WHERE LOG_YEAR = #{year} AND LOG_MONTH = #{logMonth}) MONTH_CNT
+				, TRUNCATE(( COUNT(LOG_DAY)/(SELECT COUNT(*) FROM LOG_ACCESS WHERE LOG_YEAR = #{year} AND LOG_MONTH = #{logMonth}) * 100) , 0 ) AS PERCENTAGE
+,CAST(CONCAT(COUNT(LOG_MONTH),' / ',TRUNCATE(( COUNT(LOG_MONTH)/(SELECT COUNT(*) FROM LOG_ACCESS WHERE LOG_YEAR = #{year} AND LOG_MONTH = #{logMonth}) * 100) , 0 ),'%') AS CHAR) DAY_STATS
+		 FROM LOG_ACCESS 
+		 WHERE 1=1
+			AND LOG_YEAR = #{year}
+			AND LOG_MONTH = #{logMonth}
+		 GROUP BY LOG_MONTH, LOG_DAY 
+	</select>
+	
+	<select id="selectAllStatsCnt" parameterType="egovframework.user.main.vo.MainUserVO" resultType="map">
+			SELECT
+				(SELECT COUNT(*) DAY_CNT
+				FROM LOG_ACCESS la 
+				WHERE YMD = DATE_FORMAT(CURDATE() , "%Y%m%d")
+				) DAY_CNT,
+				(SELECT COUNT(*) MONTH_CNT
+				FROM LOG_ACCESS la 
+				WHERE SUBSTRING(YMD, 1, 6) = DATE_FORMAT(CURDATE() , "%Y%m")
+				) MONTH_CNT, 
+				(SELECT COUNT(*) ALL_CNT
+				FROM LOG_ACCESS la 
+				) ALL_CNT
+	</select>
+</mapper>
